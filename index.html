@@ -32,10 +32,12 @@
             FB.login();
           }
         });
-        function myFacebookLogin() {
-          FB.login(function(){}, {scope: 'publish_actions'});
-        }
+
       };
+
+      function myFacebookLogin() {
+        FB.login(function(){}, {scope: 'publish_actions'});
+      }
 
       (function(d, s, id){
          var js, fjs = d.getElementsByTagName(s)[0];
