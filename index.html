@@ -1,3 +1,33 @@
+<!DOCTYPE html>
 <html>
-Hello World
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles/style.css" media="screen" title="no title" charset="utf-8">
+
+    <title>Facebook API</title>
+  </head>
+  <body>
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '1643476352600480',
+          xfbml      : true,
+          version    : 'v2.5'
+        });
+      };
+
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "//connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+<div class="facebooktest">
+  This is a test of facebook stuff
+</div>
+
+  </body>
 </html>
