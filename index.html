@@ -32,6 +32,9 @@
             FB.login();
           }
         });
+        function myFacebookLogin() {
+          FB.login(function(){}, {scope: 'publish_actions'});
+        }
       };
 
       (function(d, s, id){
@@ -51,6 +54,8 @@
         data-width="450"
         data-show-faces="true">
     </div>
+
+    <button onclick="myFacebookLogin()">Login with Facebook</button>
   <script src="scripts/app.js"></script>
   </body>
 </html>
