@@ -23,17 +23,6 @@
          js.src = "//connect.facebook.net/en_US/sdk.js";
          fjs.parentNode.insertBefore(js, fjs);
        }(document, 'script', 'facebook-jssdk'));
-
-       FB.ui({
-         method: 'share_open_graph',
-         action_type: 'og.likes',
-         action_properties: JSON.stringify({
-           object:'https://developers.facebook.com/docs/',
-         })
-       }, function(response){
-         // Debug response (optional)
-         console.log(response);
-       });
     </script>
 
 
@@ -44,5 +33,6 @@
         data-width="450"
         data-show-faces="true">
     </div>
+  <script src="scripts/app.js"></script>
   </body>
 </html>
