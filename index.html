@@ -14,6 +14,9 @@
           xfbml      : true,
           version    : 'v2.5'
         });
+        if (typeof facebookInit == 'function') {
+        facebookInit();
+        }
       };
 
       (function(d, s, id){
