@@ -3,7 +3,6 @@ var stage, w, h, loader;
 var sky, grant, ground, hill, hill2;
 
 function init() {
-
 	stage = new createjs.Stage("testCanvas");
 
 	// grab canvas width and height for later calculations:
@@ -15,8 +14,7 @@ function init() {
 		{src: "sky.png", id: "sky"},
 		{src: "ground.png", id: "ground"},
 		{src: "hill1.png", id: "hill"},
-		{src: "hill2.png", id: "hill2"},
-    {src: "ninja.png", id: "ninja"}
+		{src: "hill2.png", id: "hill2"}
 	];
 
 	loader = new createjs.LoadQueue(false);
@@ -48,29 +46,15 @@ function handleComplete() {
 			"frames": {"regX": 82, "height": 292, "count": 64, "regY": 0, "width": 165},
 			// define two animations, run (loops, 1.5x speed) and jump (returns to run):
 			"animations": {
-				"run": [0, 25, "run", 1.5],
+				"run": [0, 25, "run", 1],
 				"jump": [26, 63, "run"]
 			}
 		});
 	grant = new createjs.Sprite(spriteSheet, "run");
 	grant.y = 35;
 
-  var spriteSheet2 = new createjs.SpriteSheet({
-			framerate: 30,
-			"images": [loader.getResult("ninja")],
-			"frames": {"regX": 82, "height": 77, "count": 64, "regY": 0, "width": 50},
-			// define two animations, run (loops, 1.5x speed) and jump (returns to run):
-			"animations": {
-				"run": [16, 23, "run", 1],
-				"jump": [44, 46, "run"]
-			}
-		});
-	ninja = new createjs.Sprite(spriteSheet2, "run");
-	ninja.y = 400;
-
-	stage.addChild(sky, hill, hill2, ground, grant, ninja);
+	stage.addChild(sky, hill, hill2, ground, grant);
 	stage.addEventListener("stagemousedown", handleJumpStart);
-  stage.addEventListener("stagemousedown", ninjaJump);
 
 	createjs.Ticker.timingMode = createjs.Ticker.RAF;
 	createjs.Ticker.addEventListener("tick", tick);
@@ -80,21 +64,12 @@ function handleJumpStart() {
 	grant.gotoAndPlay("jump");
 }
 
-function ninjaJump() {
-  ninja.gotoAndPlay("jump");
-}
-
-
 function tick(event) {
 	var deltaS = event.delta / 1000;
 	var position = grant.x + 150 * deltaS;
-  var ninposition = ninja.x + 150 * deltaS;
 
 	var grantW = grant.getBounds().width * grant.scaleX;
 	grant.x = (position >= w + grantW) ? -grantW : position;
-
-  var ninjaW = ninja.getBounds().width * ninja.scaleX;
-	ninja.x = (ninposition >= w + ninjaW) ? -ninjaW : ninposition;
 
 	ground.x = (ground.x - deltaS * 150) % ground.tileW;
 	hill.x = (hill.x - deltaS * 30);
