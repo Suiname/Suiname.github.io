@@ -12,7 +12,7 @@ function init() {
 
     imgMonsterARun.onload = handleImageLoad;
     imgMonsterARun.onerror = handleImageError;
-    imgMonsterARun.src = "img/MonsterARun.png";
+    imgMonsterARun.src = "img/ninja.png";
 }
 
 function reset() {
@@ -38,10 +38,10 @@ function startGame() {
 	    // image to use
 	    images: [imgMonsterARun],
 	    // width, height & registration point of each sprite
-	    frames: { width: 64, height: 64, regX: 32, regY: 32 },
+	    frames: { width: 50, height: 76.2, regX: 32, regY: 32 },
 	    // To slow down the animation loop of the sprite, we set the frequency to 4 to slow down by a 4x factor
 	    animations: {
-	        walk: [0, 9, "walk", 4]
+	        walk: [16, 23, "walk", 4]
 	    }
     });
 
