@@ -38,10 +38,10 @@ function startGame() {
 	    // image to use
 	    images: [imgMonsterARun],
 	    // width, height & registration point of each sprite
-	    frames: { width: 50, height: 76.2, regX: 32, regY: 32 },
+	    frames: { width: 50, height: 75, regX: 32, regY: 32 },
 	    // To slow down the animation loop of the sprite, we set the frequency to 4 to slow down by a 4x factor
 	    animations: {
-	        walk: [16, 23, "walk", 4]
+	        walk: [8, 15, "walk", 4]
 	    }
     });
 
