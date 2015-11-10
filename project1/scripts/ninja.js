@@ -1,5 +1,5 @@
 var stage, w, h, loader;
-var ninja, enemy1, enemy2, pizza;
+var ninja, enemy1, enemy2, gameover;
 var keys = {};
 var activeplayer = 1;
 var gamestate;
@@ -13,6 +13,7 @@ function init() {
 		{src: "ninja.png", id: "ninja"},
 		{src: "MonsterARun.png", id: "enemy1"},
 		{src: "MonsterARun.png", id: "enemy2"},
+		{src: "gameover.jpg", id: "gameover"}
 	];
 
   loader = new createjs.LoadQueue(false);
@@ -38,7 +39,7 @@ function handleComplete() {
   ninja = new createjs.Sprite(spriteSheet, "run");
   ninja.y = 400;
 	ninja.direction = "right";
-	ninja.jumpTime = "0";
+	ninja.jumpTime = 0;
 
 
   var spriteSheet2 = new createjs.SpriteSheet({
@@ -68,6 +69,12 @@ function handleComplete() {
   enemy2 = new createjs.Sprite(spriteSheet2, "run");
   enemy2.y = 100;
 
+	// var spriteSheet4 = new createjs.SpriteSheet({
+	// 	framerate: 30,
+	// 	"images": [loader.getResult("gameover")],
+	//
+	// })
+
   stage.addChild(ninja, enemy1, enemy2);
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
   createjs.Ticker.addEventListener("tick", tick);
@@ -76,16 +83,44 @@ function handleComplete() {
   function ninjaJump() {
 		if(ninja.direction == "right"){
 			ninja.gotoAndPlay("jump");
-			ninja.jumpTime = 10;
+			ninja.jumpTime = 75;
 		}
   	else {
   		ninja.gotoAndPlay("jump_h");
+			ninja.jumpTime = 75;
   	}
   }
 
+	function jumpMovement(){
+		if (ninja.jumpTime > 37) {
+			ninja.y -= 2;
+		} else {
+			ninja.y += 2;
+		}
+	}
+
+
+
+	function gravityCheck(){
+		if (ninja.jumpTime == 0) {
+		}
+		else if (ninja.jumpTime > 1) {
+				jumpMovement();
+				ninja.jumpTime--;
+		} else if (ninja.direction == 'left') {
+			jumpMovement();
+			ninja.jumpTime--;
+			ninja.gotoAndPlay('run_h');
+		} else {
+			jumpMovement();
+			ninja.jumpTime--;
+			ninja.gotoAndPlay('run');
+		}
+	}
+
   function ninjaRight(){
 		ninja.x++;
-		if (ninja.direction == "left") {
+		if (ninja.direction == "left" && ninja.jumpTime == 0) {
 			ninja.gotoAndPlay("run");
 			ninja.direction = "right";
 		}
@@ -94,7 +129,7 @@ function handleComplete() {
 
   function ninjaLeft(){
     ninja.x--;
-		if (ninja.direction == "right") {
+		if (ninja.direction == "right" && ninja.jumpTime == 0) {
 			ninja.gotoAndPlay("run_h");
 			ninja.direction = "left";
 		}
@@ -109,7 +144,27 @@ function handleComplete() {
       delete keys[event.keyCode];
   }
 
+	function gameOverMan() {
+		if(activeplayer == 0){
+			//display game over screen
+		  stage = new createjs.Stage("testCanvas");
+			var goimage = new createjs.Bitmap(loader.getResult("gameover"));
+			stage.addChild(goimage);
+		}
+	}
 
+	function detectCollison() {
+		if (Math.abs(ninja.x - enemy1.x) <= 15){
+			if (Math.abs(ninja.y - enemy1.y) <= 50){
+					console.log('Collision');
+					gameOverMan();
+			}
+		}
+	}
+
+	function changePlayer(){
+		activeplayer = 0;
+	}
 
   function tick(event) {
   	var deltaS = event.delta / 1000;
@@ -122,12 +177,13 @@ function handleComplete() {
 
     if(keys[39]){ninjaRight();}
     if(keys[37]){ninjaLeft();}
-    if(keys[38]){ninjaJump();}
+    if(keys[38]){if (ninja.jumpTime == 0) {ninjaJump();}}
 
   	enemy1.x--;
     var e2W = enemy2.getBounds().width * enemy2.scaleX;
     enemy2.x = (positionE2 >= w + e2W) ? -e2W : positionE2;
 
-
+		gravityCheck();
+		detectCollison();
   	stage.update(event);
   }
