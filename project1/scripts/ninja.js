@@ -2,7 +2,7 @@ var stage, w, h, loader;
 var ninja, enemy1, enemy2, gameover;
 var keys = {};
 var activeplayer = 1;
-var gamestate;
+var enemies =  [];
 
 function init() {
 	stage = new createjs.Stage("testCanvas");
@@ -52,7 +52,7 @@ function handleComplete() {
       "run": [0, 9, "run", .25]
     }
   });
-
+	createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet2, true, false, false);
   enemy1 = new createjs.Sprite(spriteSheet2, "run");
   enemy1.y = 400;
 	enemy1.x = 450;
@@ -95,7 +95,7 @@ function handleComplete() {
   }
 
 	function jumpMovement(){
-		if (ninja.jumpTime > 37) {
+		if (ninja.jumpTime > 38) {
 			ninja.y -= 2;
 		} else {
 			ninja.y += 2;
@@ -143,8 +143,10 @@ function handleComplete() {
 		if (enemy1.x < 32 && enemy1.direction == 'left') {
 			enemy1.x++;
 			enemy1.direction = 'right';
+			enemy1.gotoAndPlay('run_h');
 		} else if (enemy1.x > 568 && enemy1.direction == 'right') {
 			enemy1.x--;
+			enemy1.gotoAndPlay('run');
 			enemy1.direction = 'left';
 		} else if (enemy1.direction == 'left'){
 			enemy1.x--;
@@ -161,19 +163,19 @@ function handleComplete() {
       delete keys[event.keyCode];
   }
 
-	function gameOverMan() {
-		if(activeplayer == 2){
-			//display game over screen
-		  stage = new createjs.Stage("testCanvas");
-			var goimage = new createjs.Bitmap(loader.getResult("gameover"));
-			stage.addChild(goimage);
-		} else if (activeplayer == 1) {
-			stage.removeChild(ninja,enemy1,enemy2);
-			nextPlayer();
-
-		}
+	function keyInput(){
+		if(keys[39]){ninjaRight();}
+		if(keys[37]){ninjaLeft();}
+		if(keys[38]){if (ninja.jumpTime == 0) {ninjaJump();}}
 	}
 
+/*
+Collision detection and game condition functions are all below
+detectCollison() checks for a collision between the ninja object and enemy objects
+by calculating the absolute value of the difference between their x and y coordinates
+if the values are both lower than a certain pixel threshold, a collision is triggered
+which stops the ticker (animation engine) then calls the gameOverMan method
+*/
 	function detectCollison() {
 		if (Math.abs(ninja.x - enemy1.x) <= 15){
 			if (Math.abs(ninja.y - enemy1.y) <= 50){
@@ -184,7 +186,24 @@ function handleComplete() {
 			}
 		}
 	}
+ /*
+ gameOverMan is a function which checks the active player variable to see which player is playing,
+ if it's player 1, it removes all the objects on the canvas and calls the nextPlayer method.  If player 2
+ is playing, it loads the game over screen.
+ */
+	function gameOverMan() {
+		if(activeplayer == 2){
+			//display game over screen
+		  stage = new createjs.Stage("testCanvas");
+			var goimage = new createjs.Bitmap(loader.getResult("gameover"));
+			stage.addChild(goimage);
+		} else if (activeplayer == 1) {
+			stage.removeChild(ninja,enemy1,enemy2);
+			nextPlayer();
+		}
+	}
 
+//resets the canvas object, loads the 2nd player ready screen, sets the active player value to 2 and calls init
 	function nextPlayer(){
 		stage.removeChild(ninja,enemy1,enemy2);
 		stage = new createjs.Stage("testCanvas");
@@ -198,21 +217,15 @@ function handleComplete() {
 		activeplayer = 2;
 	}
 
+/*
+This is the most important function, it is basically the entire animation engine.
+easel allow for the creation of a ticket event object, which basically calls this
+tick function on every animation frame, so every function below gets called on every single frame
+This allows me to easily handle movement, physics, and collision detection on every single frame.
+*/
+
   function tick(event) {
-  	var deltaS = event.delta / 1000;
-  	var position = ninja.x;
-    var positionE1 = enemy1.x;
-    var positionE2 = enemy2.x + 150 * deltaS;
-
-
-    if(keys[39]){ninjaRight();}
-    if(keys[37]){ninjaLeft();}
-    if(keys[38]){if (ninja.jumpTime == 0) {ninjaJump();}}
-
-
-    var e2W = enemy2.getBounds().width * enemy2.scaleX;
-    enemy2.x = (positionE2 >= w + e2W) ? -e2W : positionE2;
-
+		keyInput();
 		enemyMovement();
 		gravityCheck();
 		detectCollison();
