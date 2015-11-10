@@ -13,7 +13,8 @@ function init() {
 		{src: "ninja.png", id: "ninja"},
 		{src: "MonsterARun.png", id: "enemy1"},
 		{src: "MonsterARun.png", id: "enemy2"},
-		{src: "gameover.jpg", id: "gameover"}
+		{src: "gameover.jpg", id: "gameover"},
+		{src: "player2.png", id:"player2"}
 	];
 
   loader = new createjs.LoadQueue(false);
@@ -55,6 +56,8 @@ function handleComplete() {
   enemy1 = new createjs.Sprite(spriteSheet2, "run");
   enemy1.y = 400;
 	enemy1.x = 450;
+	enemy1.direction = "left";
+
 
   var spriteSheet3 = new createjs.SpriteSheet({
     framerate: 30,
@@ -136,6 +139,20 @@ function handleComplete() {
 
   }
 
+	function enemyMovement(){
+		if (enemy1.x < 32 && enemy1.direction == 'left') {
+			enemy1.x++;
+			enemy1.direction = 'right';
+		} else if (enemy1.x > 568 && enemy1.direction == 'right') {
+			enemy1.x--;
+			enemy1.direction = 'left';
+		} else if (enemy1.direction == 'left'){
+			enemy1.x--;
+		} else {
+			enemy1.x++;
+		}
+	}
+
   function keydown(event) {
       keys[event.keyCode] = true;
   }
@@ -145,11 +162,15 @@ function handleComplete() {
   }
 
 	function gameOverMan() {
-		if(activeplayer == 0){
+		if(activeplayer == 2){
 			//display game over screen
 		  stage = new createjs.Stage("testCanvas");
 			var goimage = new createjs.Bitmap(loader.getResult("gameover"));
 			stage.addChild(goimage);
+		} else if (activeplayer == 1) {
+			stage.removeChild(ninja,enemy1,enemy2);
+			nextPlayer();
+
 		}
 	}
 
@@ -157,13 +178,24 @@ function handleComplete() {
 		if (Math.abs(ninja.x - enemy1.x) <= 15){
 			if (Math.abs(ninja.y - enemy1.y) <= 50){
 					console.log('Collision');
+					console.log(activeplayer);
+					createjs.Ticker.removeAllEventListeners(); //stop the ticker
 					gameOverMan();
 			}
 		}
 	}
 
+	function nextPlayer(){
+		stage.removeChild(ninja,enemy1,enemy2);
+		stage = new createjs.Stage("testCanvas");
+		var p2image = new createjs.Bitmap(loader.getResult("player2"));
+		stage.addChild(p2image);
+		activeplayer = 2;
+		window.setTimeout(init, 1000);
+	}
+
 	function changePlayer(){
-		activeplayer = 0;
+		activeplayer = 2;
 	}
 
   function tick(event) {
@@ -172,17 +204,16 @@ function handleComplete() {
     var positionE1 = enemy1.x;
     var positionE2 = enemy2.x + 150 * deltaS;
 
-  	var ninjaW = ninja.getBounds().width * ninja.scaleX;
-
 
     if(keys[39]){ninjaRight();}
     if(keys[37]){ninjaLeft();}
     if(keys[38]){if (ninja.jumpTime == 0) {ninjaJump();}}
 
-  	enemy1.x--;
+
     var e2W = enemy2.getBounds().width * enemy2.scaleX;
     enemy2.x = (positionE2 >= w + e2W) ? -e2W : positionE2;
 
+		enemyMovement();
 		gravityCheck();
 		detectCollison();
   	stage.update(event);
