@@ -13,6 +13,12 @@ function getRandomIntInclusive(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function resetAll(){
+	activeplayer = 1;
+	enemies = [];
+	level = 1;
+}
+
 
 function init() {
 	stage = new createjs.Stage("testCanvas");
@@ -121,11 +127,11 @@ return sprite;
   function ninjaJump() {
 		if(ninja.direction == "right"){
 			ninja.gotoAndPlay("jump");
-			ninja.jumpTime = 75;
+			ninja.jumpTime = 76;
 		}
   	else {
   		ninja.gotoAndPlay("jump_h");
-			ninja.jumpTime = 75;
+			ninja.jumpTime = 76;
   	}
   }
 
@@ -238,7 +244,6 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 		for (var i in enemies) {
 			if (Math.abs(ninja.x - enemies[i].x) <= 15){
 				if (Math.abs(ninja.y - enemies[i].y) <= 50){
-						console.log('Collision');
 						createjs.Ticker.removeAllEventListeners(); //stop the ticker
 						gameOverMan();
 				}
@@ -251,21 +256,16 @@ which stops the ticker (animation engine) then calls the gameOverMan method
  is playing, it loads the game over screen.
  */
 	function gameOverMan() {
-		if(activeplayer == 2){
+		if (activeplayer == 1) {
+			stage.removeChild(ninja);
+			nextPlayer();
+		} else if(activeplayer == 2){
 			//display game over screen
 		  stage = new createjs.Stage("testCanvas");
 			var goimage = new createjs.Bitmap(loader.getResult("gameover"));
 			stage.addChild(goimage);
-			level = 1;
-			activeplayer = 1;
-		} else if (activeplayer == 1) {
-			stage.removeChild(ninja);
-			for (var i in enemies) {
-					stage.removeChild(enemies[i]);
-				}
-			enemies = [];
-			nextPlayer();
-			}
+			resetAll();
+		}
 
 
 	}
@@ -275,6 +275,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 		stage = new createjs.Stage("testCanvas");
 		var p2image = new createjs.Bitmap(loader.getResult("player2"));
 		stage.addChild(p2image);
+		level = 1;
 		activeplayer = 2;
 		window.setTimeout(init, 2000);
 	}
