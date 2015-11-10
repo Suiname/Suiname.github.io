@@ -33,9 +33,10 @@ function handleComplete() {
       "jump": [36, 39, "run", .1]
     }
   });
-
+  createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
   ninja = new createjs.Sprite(spriteSheet, "run");
   ninja.y = 400;
+
 
   var spriteSheet2 = new createjs.SpriteSheet({
     framerate: 30,
@@ -64,15 +65,22 @@ function handleComplete() {
   enemy2.y = 100;
 
   stage.addChild(ninja, enemy1, enemy2);
-  stage.addEventListener("stagemousedown", ninjaJump);
-
-
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
   createjs.Ticker.addEventListener("tick", tick);
 }
 
   function ninjaJump() {
   	ninja.gotoAndPlay("jump");
+  }
+
+  function ninjaRight(){
+    ninja.gotoAndPlay("run");
+    ninja.x++;
+  }
+
+  function ninjaLeft(){
+    ninja.x--;
+    ninja.gotoAndPlay("run_h");
   }
 
   function keydown(event) {
@@ -85,14 +93,17 @@ function handleComplete() {
 
   function tick(event) {
   	var deltaS = event.delta / 1000;
-  	var position = ninja.x + 150 * deltaS;
+  	var position = ninja.x;
     var positionE1 = enemy1.x + 150 * deltaS;
     var positionE2 = enemy2.x + 150 * deltaS;
 
   	var ninjaW = ninja.getBounds().width * ninja.scaleX;
 
 
-  if(keys[39]){ninja.x = (position >= w + ninjaW) ? -ninjaW : position}
+    if(keys[39]){ninjaRight();}
+    if(keys[37]){ninjaLeft();}
+    if(keys[38]){ninjaJump();}
+
 
     var e1W = enemy1.getBounds().width * enemy1.scaleX;
   	enemy1.x = (positionE1 >= w + e1W) ? -e1W : positionE1;
