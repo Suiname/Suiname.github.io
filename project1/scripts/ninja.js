@@ -3,7 +3,7 @@ var ninja, enemy1, enemy2, gameover;
 var keys = {};
 var activeplayer = 1;
 var enemies =  [];
-level = 1;
+var level = 1;
 
 /*
 Util functions
@@ -81,16 +81,17 @@ function handleComplete() {
 	//
   // enemy2 = new createjs.Sprite(spriteSheet2, "run");
   // enemy2.y = 100;
+	enemies = [];
 	for (var i = 0; i < level; i++){
-	enemies.push(new enemy());
-	enemies[i].x = getRandomIntInclusive(0,w);
+	var newEnemy = new enemy();
+	newEnemy.x = getRandomIntInclusive(0,w);
+	enemies.push(newEnemy);
 	}
 	// var spriteSheet4 = new createjs.SpriteSheet({
 	// 	framerate: 30,
 	// 	"images": [loader.getResult("gameover")],
 	//
 	// })
-
   stage.addChild(ninja);
 	for (var i in enemies) {
 		stage.addChild(enemies[i]);
@@ -238,7 +239,6 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 			if (Math.abs(ninja.x - enemies[i].x) <= 15){
 				if (Math.abs(ninja.y - enemies[i].y) <= 50){
 						console.log('Collision');
-						console.log(activeplayer);
 						createjs.Ticker.removeAllEventListeners(); //stop the ticker
 						gameOverMan();
 				}
@@ -256,6 +256,8 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 		  stage = new createjs.Stage("testCanvas");
 			var goimage = new createjs.Bitmap(loader.getResult("gameover"));
 			stage.addChild(goimage);
+			level = 1;
+			activeplayer = 1;
 		} else if (activeplayer == 1) {
 			stage.removeChild(ninja);
 			for (var i in enemies) {
