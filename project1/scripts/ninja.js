@@ -1,8 +1,18 @@
-var stage, w, h, loader;
+var stage, w, h, loader, level;
 var ninja, enemy1, enemy2, gameover;
 var keys = {};
 var activeplayer = 1;
 var enemies =  [];
+level = 1;
+
+/*
+Util functions
+*/
+
+function getRandomIntInclusive(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 
 function init() {
 	stage = new createjs.Stage("testCanvas");
@@ -71,15 +81,17 @@ function handleComplete() {
 	//
   // enemy2 = new createjs.Sprite(spriteSheet2, "run");
   // enemy2.y = 100;
-	enemies.unshift(new enemy());
-	console.log(enemies);
+	for (var i = 0; i < level; i++){
+	enemies.push(new enemy());
+	enemies[i].x = getRandomIntInclusive(0,w);
+	}
 	// var spriteSheet4 = new createjs.SpriteSheet({
 	// 	framerate: 30,
 	// 	"images": [loader.getResult("gameover")],
 	//
 	// })
 
-  stage.addChild(ninja, enemy1, enemy2);
+  stage.addChild(ninja);
 	for (var i in enemies) {
 		stage.addChild(enemies[i]);
 	}
@@ -263,6 +275,10 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 		stage.addChild(p2image);
 		activeplayer = 2;
 		window.setTimeout(init, 2000);
+	}
+
+	function nextLevel(){
+		level++;
 	}
 
 	function changePlayer(){
