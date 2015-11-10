@@ -43,35 +43,36 @@ function handleComplete() {
 	ninja.jumpTime = 0;
 
 
-  var spriteSheet2 = new createjs.SpriteSheet({
-    framerate: 30,
-    "images": [loader.getResult("enemy1")],
-    "frames": {"height": 64, "width": 64, "regX": 32, "regY": 32},
-    // define run animation
-    "animations": {
-      "run": [0, 9, "run", .25]
-    }
-  });
-	createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet2, true, false, false);
-  enemy1 = new createjs.Sprite(spriteSheet2, "run");
-  enemy1.y = 400;
-	enemy1.x = 450;
-	enemy1.direction = "left";
+  // var spriteSheet2 = new createjs.SpriteSheet({
+  //   framerate: 30,
+  //   "images": [loader.getResult("enemy1")],
+  //   "frames": {"height": 64, "width": 64, "regX": 32, "regY": 32},
+  //   // define run animation
+  //   "animations": {
+  //     "run": [0, 9, "run", .25]
+  //   }
+  // });
+	// createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet2, true, false, false);
+  // enemy1 = new createjs.Sprite(spriteSheet2, "run");
+  // enemy1.y = 400;
+	// enemy1.x = 450;
+	// enemy1.direction = "left";
 
 
-  var spriteSheet3 = new createjs.SpriteSheet({
-    framerate: 30,
-    "images": [loader.getResult("enemy2")],
-    "frames": {"height": 64, "width": 64, "regX": 32, "regY": 32},
-    // define run animation
-    "animations": {
-      "run": [0, 9, "run", .25]
-    }
-  });
-
-  enemy2 = new createjs.Sprite(spriteSheet2, "run");
-  enemy2.y = 100;
-
+  // var spriteSheet3 = new createjs.SpriteSheet({
+  //   framerate: 30,
+  //   "images": [loader.getResult("enemy2")],
+  //   "frames": {"height": 64, "width": 64, "regX": 32, "regY": 32},
+  //   // define run animation
+  //   "animations": {
+  //     "run": [0, 9, "run", .25]
+  //   }
+  // });
+	//
+  // enemy2 = new createjs.Sprite(spriteSheet2, "run");
+  // enemy2.y = 100;
+	enemies.unshift(new enemy());
+	console.log(enemies);
 	// var spriteSheet4 = new createjs.SpriteSheet({
 	// 	framerate: 30,
 	// 	"images": [loader.getResult("gameover")],
@@ -79,8 +80,29 @@ function handleComplete() {
 	// })
 
   stage.addChild(ninja, enemy1, enemy2);
+	for (var i in enemies) {
+		stage.addChild(enemies[i]);
+	}
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
   createjs.Ticker.addEventListener("tick", tick);
+}
+
+function enemy() {
+var spriteSheet2 = new createjs.SpriteSheet({
+	framerate: 30,
+	"images": [loader.getResult("enemy1")],
+	"frames": {"height": 64, "width": 64, "regX": 32, "regY": 32},
+	// define run animation
+	"animations": {
+		"run": [0, 9, "run", .25]
+	}
+});
+createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet2, true, false, false);
+var sprite = new createjs.Sprite(spriteSheet2, "run");
+sprite.y = 400;
+sprite.x = 450;
+sprite.direction = "left";
+return sprite;
 }
 
   function ninjaJump() {
@@ -140,18 +162,33 @@ function handleComplete() {
   }
 
 	function enemyMovement(){
-		if (enemy1.x < 32 && enemy1.direction == 'left') {
-			enemy1.x++;
-			enemy1.direction = 'right';
-			enemy1.gotoAndPlay('run_h');
-		} else if (enemy1.x > 568 && enemy1.direction == 'right') {
-			enemy1.x--;
-			enemy1.gotoAndPlay('run');
-			enemy1.direction = 'left';
-		} else if (enemy1.direction == 'left'){
-			enemy1.x--;
-		} else {
-			enemy1.x++;
+		// if (enemy1.x < 32 && enemy1.direction == 'left') {
+		// 	enemy1.x++;
+		// 	enemy1.direction = 'right';
+		// 	enemy1.gotoAndPlay('run_h');
+		// } else if (enemy1.x > w - 32 && enemy1.direction == 'right') {
+		// 	enemy1.x--;
+		// 	enemy1.gotoAndPlay('run');
+		// 	enemy1.direction = 'left';
+		// } else if (enemy1.direction == 'left'){
+		// 	enemy1.x--;
+		// } else {
+		// 	enemy1.x++;
+		// }
+		for (var i in enemies) {
+					if (enemies[i].x < 32 && enemies[i].direction == 'left') {
+						enemies[i].x++;
+						enemies[i].direction = 'right';
+						enemies[i].gotoAndPlay('run_h');
+					} else if (enemies[i].x > w - 32 && enemies[i].direction == 'right') {
+						enemies[i].x--;
+						enemies[i].gotoAndPlay('run');
+						enemies[i].direction = 'left';
+					} else if (enemies[i].direction == 'left'){
+						enemies[i].x--;
+					} else {
+						enemies[i].x++;
+					}
 		}
 	}
 
@@ -177,12 +214,22 @@ if the values are both lower than a certain pixel threshold, a collision is trig
 which stops the ticker (animation engine) then calls the gameOverMan method
 */
 	function detectCollison() {
-		if (Math.abs(ninja.x - enemy1.x) <= 15){
-			if (Math.abs(ninja.y - enemy1.y) <= 50){
-					console.log('Collision');
-					console.log(activeplayer);
-					createjs.Ticker.removeAllEventListeners(); //stop the ticker
-					gameOverMan();
+		// if (Math.abs(ninja.x - enemy1.x) <= 15){
+		// 	if (Math.abs(ninja.y - enemy1.y) <= 50){
+		// 			console.log('Collision');
+		// 			console.log(activeplayer);
+		// 			createjs.Ticker.removeAllEventListeners(); //stop the ticker
+		// 			gameOverMan();
+		// 	}
+		// }
+		for (var i in enemies) {
+			if (Math.abs(ninja.x - enemies[i].x) <= 15){
+				if (Math.abs(ninja.y - enemies[i].y) <= 50){
+						console.log('Collision');
+						console.log(activeplayer);
+						createjs.Ticker.removeAllEventListeners(); //stop the ticker
+						gameOverMan();
+				}
 			}
 		}
 	}
@@ -198,19 +245,24 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 			var goimage = new createjs.Bitmap(loader.getResult("gameover"));
 			stage.addChild(goimage);
 		} else if (activeplayer == 1) {
-			stage.removeChild(ninja,enemy1,enemy2);
+			stage.removeChild(ninja);
+			for (var i in enemies) {
+					stage.removeChild(enemies[i]);
+				}
+			enemies = [];
 			nextPlayer();
-		}
+			}
+
+
 	}
 
 //resets the canvas object, loads the 2nd player ready screen, sets the active player value to 2 and calls init
 	function nextPlayer(){
-		stage.removeChild(ninja,enemy1,enemy2);
 		stage = new createjs.Stage("testCanvas");
 		var p2image = new createjs.Bitmap(loader.getResult("player2"));
 		stage.addChild(p2image);
 		activeplayer = 2;
-		window.setTimeout(init, 1000);
+		window.setTimeout(init, 2000);
 	}
 
 	function changePlayer(){
@@ -219,7 +271,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 
 /*
 This is the most important function, it is basically the entire animation engine.
-easel allow for the creation of a ticket event object, which basically calls this
+easel allows for the creation of a ticket event object, which basically calls this
 tick function on every animation frame, so every function below gets called on every single frame
 This allows me to easily handle movement, physics, and collision detection on every single frame.
 */
