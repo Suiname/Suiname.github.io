@@ -61,17 +61,21 @@ function handleComplete() {
 	ninja.direction = "right";
 	ninja.jumpTime = 0;
 
-	var spriteSheetT = new createjs.SpriteSheet({
-		framerate:30,
-		"images": [loader.getResult("chest")],
-		"frames": {"height" : 32, "width": 80, "regX": 40, "regY":16},
-		"animations": {
-			"idle": [0, 0, "idle", 1]
-		}
-	});
-	treasure = new createjs.Sprite(spriteSheetT, "idle");
-	treasure.y = 400;
-	treasure.x = 800;
+	// var spriteSheetT = new createjs.SpriteSheet({
+	// 	framerate:30,
+	// 	"images": [loader.getResult("chest")],
+	// 	"frames": {"height" : 32, "width": 80, "regX": 40, "regY":16},
+	// 	"animations": {
+	// 		"idle": [0, 0, "idle", 1]
+	// 	}
+	// });
+	// treasure = new createjs.Sprite(spriteSheetT, "idle");
+	// treasure.y = 400;
+	// treasure.x = 800;
+
+  treasure = new asset('chest', 32, 80, 800, 400);
+
+
   // var spriteSheet2 = new createjs.SpriteSheet({
   //   framerate: 30,
   //   "images": [loader.getResult("enemy1")],
@@ -136,6 +140,21 @@ sprite.y = 400;
 sprite.x = 450;
 sprite.direction = "left";
 return sprite;
+}
+
+function asset(assetType, assetHeight, assetWidth, assetX, assetY){
+  var spriteSheetT = new createjs.SpriteSheet({
+    framerate:30,
+    "images": [loader.getResult(assetType)],
+    "frames": {"height" : assetHeight, "width": assetWidth, "regX": assetWidth/2 , "regY": assetHeight/2},
+    "animations": {
+      "idle": [0, 0, "idle", 1]
+    }
+  });
+  var result = new createjs.Sprite(spriteSheetT, "idle");
+  result.y = assetY;
+  result.x = assetX;
+  return result;
 }
 
   function ninjaJump() {
