@@ -3,7 +3,8 @@ var ninja, gameover, treasure, bg, block;
 var keys = {};
 var activeplayer = 1;
 var enemies =  [];
-var floorplan = [[]];
+var floorplan = [];
+
 var level = 1;
 
 /*
@@ -34,7 +35,8 @@ function init() {
 		{src: "chest.png", id:"chest"},
     {src: "ladder.png", id:"ladder"},
     {src: "floor.png", id:"floor"},
-    {src: "brick.png", id:"brick"}
+    {src: "brick.png", id:"brick"},
+    {src: "1.txt", id:"level1"}
 	];
 
   loader = new createjs.LoadQueue(false);
@@ -49,7 +51,7 @@ function handleComplete() {
   var spriteSheet = new createjs.SpriteSheet({
     framerate: 30,
     "images": [loader.getResult("ninja")],
-    "frames": {"height": 77, "width": 50, "regX": 25, "regY": 38.5},
+    "frames": {"height": 77, "width": 50, "regX": 25, "regY": 77},
     // define two animations, run and jump
     "animations": {
       "run": [16, 23, "run", .25],
@@ -58,70 +60,24 @@ function handleComplete() {
   });
   createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
   ninja = new createjs.Sprite(spriteSheet, "run");
-  ninja.y = 400;
+  ninja.y = 16;
+  ninja.x = 5;
 	ninja.direction = "right";
 	ninja.jumpTime = 0;
 
-	// var spriteSheetT = new createjs.SpriteSheet({
-	// 	framerate:30,
-	// 	"images": [loader.getResult("chest")],
-	// 	"frames": {"height" : 32, "width": 80, "regX": 40, "regY":16},
-	// 	"animations": {
-	// 		"idle": [0, 0, "idle", 1]
-	// 	}
-	// });
-	// treasure = new createjs.Sprite(spriteSheetT, "idle");
-	// treasure.y = 400;
-	// treasure.x = 800;
-
-  treasure = new asset('chest', 32, 80, 800, 400);
-
-
-  // var spriteSheet2 = new createjs.SpriteSheet({
-  //   framerate: 30,
-  //   "images": [loader.getResult("enemy1")],
-  //   "frames": {"height": 64, "width": 64, "regX": 32, "regY": 32},
-  //   // define run animation
-  //   "animations": {
-  //     "run": [0, 9, "run", .25]
-  //   }
-  // });
-	// createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet2, true, false, false);
-  // enemy1 = new createjs.Sprite(spriteSheet2, "run");
-  // enemy1.y = 400;
-	// enemy1.x = 450;
-	// enemy1.direction = "left";
-
-
-  // var spriteSheet3 = new createjs.SpriteSheet({
-  //   framerate: 30,
-  //   "images": [loader.getResult("enemy2")],
-  //   "frames": {"height": 64, "width": 64, "regX": 32, "regY": 32},
-  //   // define run animation
-  //   "animations": {
-  //     "run": [0, 9, "run", .25]
-  //   }
-  // });
-	//
-  // enemy2 = new createjs.Sprite(spriteSheet2, "run");
-  // enemy2.y = 100;
+  treasure = new asset('chest', 32, 80, 600, 100);
 	enemies = [];
 	for (var i = 0; i < level; i++){
 	var newEnemy = new enemy();
 	newEnemy.x = getRandomIntInclusive(100,w);
 	enemies.push(newEnemy);
 	}
-	// var spriteSheet4 = new createjs.SpriteSheet({
-	// 	framerate: 30,
-	// 	"images": [loader.getResult("gameover")],
-	//
-	// })
   bg = new createjs.Shape();
   bg.graphics.beginBitmapFill(loader.getResult("brick")).drawRect(0, 0, w, h);
   stage.addChild(bg);
-  // newLevel();
-  stage.addChild(ninja);
+  newLevel();
 	stage.addChild(treasure);
+  stage.addChild(ninja);
 	for (var i in enemies) {
 		stage.addChild(enemies[i]);
 	}
@@ -152,7 +108,7 @@ function asset(assetType, assetHeight, assetWidth, assetX, assetY){
   var spriteSheetT = new createjs.SpriteSheet({
     framerate:30,
     "images": [loader.getResult(assetType)],
-    "frames": {"height" : assetHeight, "width": assetWidth, "regX": assetWidth/2 , "regY": assetHeight/2},
+    "frames": {"height" : assetHeight, "width": assetWidth, "regX": assetWidth/2 , "regY": 0},
     "animations": {
       "idle": [0, 0, "idle", 1]
     }
@@ -164,24 +120,36 @@ function asset(assetType, assetHeight, assetWidth, assetX, assetY){
 }
 
 function newLevel(){
-  var wc, hc = 0;
+  var wc = 1;
+  var hc = 1;
   switch (level) {
     case 1:
-    $.get('levels/1.txt', function(data) {
+    floorplan = [];
+    $.get('img/1.txt', function(data) {
       var txtout = data;
       for (var i in txtout) {
         if (txtout[i] == '.'){
-          block = new asset('floor', 16, 32, hc*16, wc*32);
+          block = new asset('floor', 16, 32, wc*32 - 16, (hc*128));
+          // console.log('hc is ' + hc + 'and wc is ' + wc);
           stage.addChild(block);
-          floorplan[wc][hc] = '.';
-          console.log('width coordinate +');
+          wc++;
+          floorplan.push(block);
+          // console.log('width coordinate +');
         } else if (txtout[i] == ',') {
-          console.log('height coordinate +');
+          // console.log('height coordinate +, width coordinate 0');
+          hc++;
+          wc = 1;
         } else if (txtout[i] == '~') {
-          console.log('ladder');
+          block = new asset('ladder', 64, 64, wc*32 - 16, (hc*128));
+          stage.addChild(block);
+          floorplan.push(block);
+          wc++;
+        } else if (txtout[i] == '|') {
+          wc++;
         }
       }
     });
+    console.log(floorplan);
       break;
     case 2:
       break;
@@ -211,10 +179,23 @@ function newLevel(){
 		}
 	}
 
+  function ninjaFall(){
+    var grounded = 0;
+    for (var i = 0; i < floorplan.length; i++) {
+      if ((Math.abs(ninja.x - floorplan[i].x) <= 24) && (Math.abs(ninja.y - floorplan[i].y) <= 1)) {
+        grounded += 1;
+      }
+    }
+    if(grounded == 0){
+      ninja.y +=2;
+    }
+  }
 
 
 	function gravityCheck(){
+
 		if (ninja.jumpTime == 0) {
+      ninjaFall();
 		}
 		else if (ninja.jumpTime > 1) {
 				jumpMovement();
@@ -249,19 +230,6 @@ function newLevel(){
   }
 
 	function enemyMovement(){
-		// if (enemy1.x < 32 && enemy1.direction == 'left') {
-		// 	enemy1.x++;
-		// 	enemy1.direction = 'right';
-		// 	enemy1.gotoAndPlay('run_h');
-		// } else if (enemy1.x > w - 32 && enemy1.direction == 'right') {
-		// 	enemy1.x--;
-		// 	enemy1.gotoAndPlay('run');
-		// 	enemy1.direction = 'left';
-		// } else if (enemy1.direction == 'left'){
-		// 	enemy1.x--;
-		// } else {
-		// 	enemy1.x++;
-		// }
 		for (var i in enemies) {
 					if (enemies[i].x < 32 && enemies[i].direction == 'left') {
 						enemies[i].x++;
@@ -301,16 +269,8 @@ if the values are both lower than a certain pixel threshold, a collision is trig
 which stops the ticker (animation engine) then calls the gameOverMan method
 */
 	function detectCollison() {
-		// if (Math.abs(ninja.x - enemy1.x) <= 15){
-		// 	if (Math.abs(ninja.y - enemy1.y) <= 50){
-		// 			console.log('Collision');
-		// 			console.log(activeplayer);
-		// 			createjs.Ticker.removeAllEventListeners(); //stop the ticker
-		// 			gameOverMan();
-		// 	}
-		// }
-		if (Math.abs(ninja.x - treasure.x) <= 1){
-			if(Math.abs(ninja.y - treasure.y) <= 1){
+		if (Math.abs(ninja.x - treasure.x) <= 5){
+			if(Math.abs(ninja.y - treasure.y) <= 30){
 				createjs.Ticker.removeAllEventListeners();
 				nextLevel();
 			}
