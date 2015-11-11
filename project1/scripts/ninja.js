@@ -1,5 +1,5 @@
 var stage, w, h, loader, level;
-var ninja, enemy1, enemy2, gameover;
+var ninja, enemy1, enemy2, gameover, treasure;
 var keys = {};
 var activeplayer = 1;
 var enemies =  [];
@@ -30,7 +30,8 @@ function init() {
 		{src: "MonsterARun.png", id: "enemy1"},
 		{src: "MonsterARun.png", id: "enemy2"},
 		{src: "gameover.jpg", id: "gameover"},
-		{src: "player2.png", id:"player2"}
+		{src: "player2.png", id:"player2"},
+		{src: "chest.png", id:"chest"}
 	];
 
   loader = new createjs.LoadQueue(false);
@@ -58,7 +59,17 @@ function handleComplete() {
 	ninja.direction = "right";
 	ninja.jumpTime = 0;
 
-
+	var spriteSheetT = new createjs.SpriteSheet({
+		framerate:30,
+		"images": [loader.getResult("chest")],
+		"frames": {"height" : 32, "width": 80, "regX": 40, "regY":16},
+		"animations": {
+			"idle": [0, 0, "idle", 1]
+		}
+	});
+	treasure = new createjs.Sprite(spriteSheetT, "idle");
+	treasure.y = 400;
+	treasure.x = 800;
   // var spriteSheet2 = new createjs.SpriteSheet({
   //   framerate: 30,
   //   "images": [loader.getResult("enemy1")],
@@ -99,6 +110,7 @@ function handleComplete() {
 	//
 	// })
   stage.addChild(ninja);
+	stage.addChild(treasure);
 	for (var i in enemies) {
 		stage.addChild(enemies[i]);
 	}
@@ -241,14 +253,22 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 		// 			gameOverMan();
 		// 	}
 		// }
-		for (var i in enemies) {
-			if (Math.abs(ninja.x - enemies[i].x) <= 15){
-				if (Math.abs(ninja.y - enemies[i].y) <= 50){
-						createjs.Ticker.removeAllEventListeners(); //stop the ticker
-						gameOverMan();
+		if (Math.abs(ninja.x - treasure.x) <= 1){
+			if(Math.abs(ninja.y - treasure.y) <= 1){
+				createjs.Ticker.removeAllEventListeners();
+				nextLevel();
+			}
+		} else {
+			for (var i in enemies) {
+				if (Math.abs(ninja.x - enemies[i].x) <= 15){
+					if (Math.abs(ninja.y - enemies[i].y) <= 50){
+							createjs.Ticker.removeAllEventListeners(); //stop the ticker
+							gameOverMan();
+					}
 				}
 			}
 		}
+
 	}
  /*
  gameOverMan is a function which checks the active player variable to see which player is playing,
@@ -282,6 +302,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 
 	function nextLevel(){
 		level++;
+		init();
 	}
 
 	function changePlayer(){
