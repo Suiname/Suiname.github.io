@@ -133,7 +133,8 @@ function createLevel(lvlname){
   bg = new createjs.Shape();
   bg.graphics.beginBitmapFill(loader.getResult("brick")).drawRect(0, 0, w, h);
   stage.addChild(bg);
-  treasure = new asset('chest', 32, 80, 900, 610);
+  treasure = new asset('chest', 32, 80, 900, 625);
+  treasure.regY = 16;
   stage.addChild(treasure);
   hero();
   var wc = 1;
@@ -232,7 +233,7 @@ function createLevel(lvlname){
 	}
 
   function ninjaRight(){
-		ninja.x++;
+		ninja.x += 1.5;
 		if (ninja.direction == "left" && ninja.jumpTime == 0) {
 			ninja.gotoAndPlay("run");
 			ninja.direction = "right";
@@ -241,7 +242,7 @@ function createLevel(lvlname){
   }
 
   function ninjaLeft(){
-    ninja.x--;
+    ninja.x -= 1.5;
 		if (ninja.direction == "right" && ninja.jumpTime == 0) {
 			ninja.gotoAndPlay("run_h");
 			ninja.direction = "left";
@@ -303,8 +304,8 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 */
 	function detectCollison() {
 		if (Math.abs(ninja.x - treasure.x) <= 5){
-			if(Math.abs(ninja.y - treasure.y) <= 30){
-				createjs.Ticker.removeAllEventListeners();
+			if(Math.abs(ninja.y - treasure.y) <= 13){
+				createjs.Ticker.removeAllEventListeners(); //stop the ticker
 				nextLevel();
 			}
 		} else {
