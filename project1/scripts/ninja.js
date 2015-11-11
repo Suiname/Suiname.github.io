@@ -38,7 +38,8 @@ function init() {
     {src: "brick.png", id:"brick"},
     {src: "1.txt", id:"level1"},
     {src: "2.txt", id:"level2"},
-    {src: "3.txt", id:"level3"}
+    {src: "3.txt", id:"level3"},
+    {src: "win.png", id:"win"}
 	];
 
   loader = new createjs.LoadQueue(false);
@@ -355,13 +356,28 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 	}
 
 	function nextLevel(){
-		level++;
-		init();
+    if(level == 3){
+      youWin();
+    } else {
+      level++;
+  		init();
+    }
 	}
 
 	function changePlayer(){
 		activeplayer = 2;
 	}
+
+  function youWin(){
+    stage = new createjs.Stage("testCanvas");
+    var winimage = new createjs.Bitmap(loader.getResult("win"));
+    stage.addChild(winimage);
+    if (activeplayer == 1) {
+      window.setTimeout(nextPlayer, 4000);
+    } else {
+      //results screen
+    }
+  }
 
 /*
 This is the most important function, it is basically the entire animation engine.
