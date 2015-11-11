@@ -36,7 +36,9 @@ function init() {
     {src: "ladder.png", id:"ladder"},
     {src: "floor.png", id:"floor"},
     {src: "brick.png", id:"brick"},
-    {src: "1.txt", id:"level1"}
+    {src: "1.txt", id:"level1"},
+    {src: "2.txt", id:"level2"},
+    {src: "3.txt", id:"level3"}
 	];
 
   loader = new createjs.LoadQueue(false);
@@ -62,16 +64,17 @@ function handleComplete() {
   ninja = new createjs.Sprite(spriteSheet, "run");
   ninja.y = 16;
   ninja.x = 5;
+  ninja.falling = false;
 	ninja.direction = "right";
 	ninja.jumpTime = 0;
 
   treasure = new asset('chest', 32, 80, 600, 100);
-	enemies = [];
-	for (var i = 0; i < level; i++){
-	var newEnemy = new enemy();
-	newEnemy.x = getRandomIntInclusive(100,w);
-	enemies.push(newEnemy);
-	}
+	// enemies = [];
+	// for (var i = 0; i < level; i++){
+	// var newEnemy = new enemy();
+	// newEnemy.x = getRandomIntInclusive(100,w);
+	// enemies.push(newEnemy);
+	// }
   bg = new createjs.Shape();
   bg.graphics.beginBitmapFill(loader.getResult("brick")).drawRect(0, 0, w, h);
   stage.addChild(bg);
@@ -98,10 +101,28 @@ var spriteSheet2 = new createjs.SpriteSheet({
 });
 createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet2, true, false, false);
 var sprite = new createjs.Sprite(spriteSheet2, "run");
-sprite.y = 400;
-sprite.x = 450;
 sprite.direction = "left";
 return sprite;
+}
+
+function hero(){
+  var spriteSheet = new createjs.SpriteSheet({
+    framerate: 30,
+    "images": [loader.getResult("ninja")],
+    "frames": {"height": 77, "width": 50, "regX": 25, "regY": 77},
+    // define two animations, run and jump
+    "animations": {
+      "run": [16, 23, "run", .25],
+      "jump": [36, 39, "run", .1]
+    }
+  });
+  createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
+  ninja = new createjs.Sprite(spriteSheet, "run");
+  ninja.y = 16;
+  ninja.x = 5;
+  ninja.falling = false;
+  ninja.direction = "right";
+  ninja.jumpTime = 0;
 }
 
 function asset(assetType, assetHeight, assetWidth, assetX, assetY){
@@ -119,45 +140,59 @@ function asset(assetType, assetHeight, assetWidth, assetX, assetY){
   return result;
 }
 
-function newLevel(){
-  var wc = 1;
-  var hc = 1;
+function newLevel(lvlname){
   switch (level) {
     case 1:
-    floorplan = [];
-    $.get('img/1.txt', function(data) {
-      var txtout = data;
-      for (var i in txtout) {
-        if (txtout[i] == '.'){
-          block = new asset('floor', 16, 32, wc*32 - 16, (hc*128));
-          // console.log('hc is ' + hc + 'and wc is ' + wc);
-          stage.addChild(block);
-          wc++;
-          floorplan.push(block);
-          // console.log('width coordinate +');
-        } else if (txtout[i] == ',') {
-          // console.log('height coordinate +, width coordinate 0');
-          hc++;
-          wc = 1;
-        } else if (txtout[i] == '~') {
-          block = new asset('ladder', 64, 64, wc*32 - 16, (hc*128));
-          stage.addChild(block);
-          floorplan.push(block);
-          wc++;
-        } else if (txtout[i] == '|') {
-          wc++;
-        }
-      }
-    });
-    console.log(floorplan);
+    createLevel('img/1.txt');
       break;
     case 2:
+    createLevel('img/2.txt');
       break;
     case 3:
+    createLevel('img/3.txt');
       break;
     default:
-
+    createLevel(lvlname);
   }
+}
+
+function createLevel(lvlname){
+  var wc = 1;
+  var hc = 1;
+  floorplan = [];
+  enemies = [];
+  $.get(lvlname, function(data) {
+    var txtout = data;
+    for (var i in txtout) {
+      if (txtout[i] == '.'){
+        block = new asset('floor', 16, 32, wc*32 - 16, (hc*128));
+        stage.addChild(block);
+        wc++;
+        floorplan.push(block);
+      } else if (txtout[i] == ',') {
+        hc++;
+        wc = 1;
+      } else if (txtout[i] == '~') {
+        block = new asset('ladder', 128, 64, wc*32 - 16, (hc*128));
+        stage.addChild(block);
+        floorplan.push(block);
+        wc++;
+      } else if (txtout[i] == '|') {
+        wc++;
+      } else if (txtout[i] == 'z'){
+        var zombie = new enemy();
+        zombie.x = wc*32 -16;
+        zombie.y = hc*128 -32;
+        enemies.push(zombie);
+        stage.addChild(zombie);
+        block = new asset('floor', 16, 32, wc*32 - 16, (hc*128));
+        stage.addChild(block);
+        wc++;
+        floorplan.push(block);
+        // console.log("zombie");
+      }
+    }
+  });
 }
 
   function ninjaJump() {
@@ -181,6 +216,7 @@ function newLevel(){
 
   function ninjaFall(){
     var grounded = 0;
+    ninja.falling = false;
     for (var i = 0; i < floorplan.length; i++) {
       if ((Math.abs(ninja.x - floorplan[i].x) <= 24) && (Math.abs(ninja.y - floorplan[i].y) <= 1)) {
         grounded += 1;
@@ -188,7 +224,9 @@ function newLevel(){
     }
     if(grounded == 0){
       ninja.y +=2;
+      ninja.falling = true;
     }
+
   }
 
 
@@ -258,7 +296,7 @@ function newLevel(){
 	function keyInput(){
 		if(keys[39]){ninjaRight();}
 		if(keys[37]){ninjaLeft();}
-		if(keys[38]){if (ninja.jumpTime == 0) {ninjaJump();}}
+		if(keys[38]){if (ninja.jumpTime == 0 && ninja.falling == false) {ninjaJump();}}
 	}
 
 /*
