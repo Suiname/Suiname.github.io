@@ -1,8 +1,9 @@
 var stage, w, h, loader, level;
-var ninja, gameover, treasure;
+var ninja, gameover, treasure, bg, block;
 var keys = {};
 var activeplayer = 1;
 var enemies =  [];
+var floorplan = [[]];
 var level = 1;
 
 /*
@@ -32,7 +33,8 @@ function init() {
 		{src: "player2.png", id:"player2"},
 		{src: "chest.png", id:"chest"},
     {src: "ladder.png", id:"ladder"},
-    {src: "floor.png", id:"floor"}
+    {src: "floor.png", id:"floor"},
+    {src: "brick.png", id:"brick"}
 	];
 
   loader = new createjs.LoadQueue(false);
@@ -114,11 +116,16 @@ function handleComplete() {
 	// 	"images": [loader.getResult("gameover")],
 	//
 	// })
+  bg = new createjs.Shape();
+  bg.graphics.beginBitmapFill(loader.getResult("brick")).drawRect(0, 0, w, h);
+  stage.addChild(bg);
+  // newLevel();
   stage.addChild(ninja);
 	stage.addChild(treasure);
 	for (var i in enemies) {
 		stage.addChild(enemies[i]);
 	}
+
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
   createjs.Ticker.addEventListener("tick", tick);
 }
@@ -154,6 +161,35 @@ function asset(assetType, assetHeight, assetWidth, assetX, assetY){
   result.y = assetY;
   result.x = assetX;
   return result;
+}
+
+function newLevel(){
+  var wc, hc = 0;
+  switch (level) {
+    case 1:
+    $.get('levels/1.txt', function(data) {
+      var txtout = data;
+      for (var i in txtout) {
+        if (txtout[i] == '.'){
+          block = new asset('floor', 16, 32, hc*16, wc*32);
+          stage.addChild(block);
+          floorplan[wc][hc] = '.';
+          console.log('width coordinate +');
+        } else if (txtout[i] == ',') {
+          console.log('height coordinate +');
+        } else if (txtout[i] == '~') {
+          console.log('ladder');
+        }
+      }
+    });
+      break;
+    case 2:
+      break;
+    case 3:
+      break;
+    default:
+
+  }
 }
 
   function ninjaJump() {
