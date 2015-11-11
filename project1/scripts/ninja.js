@@ -1,5 +1,5 @@
 var stage, w, h, loader, level;
-var ninja, enemy1, enemy2, gameover, treasure;
+var ninja, gameover, treasure;
 var keys = {};
 var activeplayer = 1;
 var enemies =  [];
@@ -28,7 +28,6 @@ function init() {
   images = [
 		{src: "ninja.png", id: "ninja"},
 		{src: "MonsterARun.png", id: "enemy1"},
-		{src: "MonsterARun.png", id: "enemy2"},
 		{src: "gameover.jpg", id: "gameover"},
 		{src: "player2.png", id:"player2"},
 		{src: "chest.png", id:"chest"},
@@ -107,7 +106,7 @@ function handleComplete() {
 	enemies = [];
 	for (var i = 0; i < level; i++){
 	var newEnemy = new enemy();
-	newEnemy.x = getRandomIntInclusive(0,w);
+	newEnemy.x = getRandomIntInclusive(100,w);
 	enemies.push(newEnemy);
 	}
 	// var spriteSheet4 = new createjs.SpriteSheet({
@@ -280,7 +279,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 				nextLevel();
 			}
 		} else {
-			for (var i in enemies) {
+			for (var i = 0; i < enemies.length; i++) {
 				if (Math.abs(ninja.x - enemies[i].x) <= 15){
 					if (Math.abs(ninja.y - enemies[i].y) <= 50){
 							createjs.Ticker.removeAllEventListeners(); //stop the ticker
@@ -339,8 +338,8 @@ This allows me to easily handle movement, physics, and collision detection on ev
 
   function tick(event) {
 		keyInput();
+    detectCollison();
 		enemyMovement();
 		gravityCheck();
-		detectCollison();
   	stage.update(event);
   }
