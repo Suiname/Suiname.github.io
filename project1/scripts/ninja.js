@@ -1,11 +1,11 @@
 var stage, w, h, loader, level;
-var ninja, gameover, treasure, bg, block;
 var keys = {};
 var activeplayer = 1;
 var enemies =  [];
 var floorplan = [];
 var holes = [];
 var level = 1;
+var ninja, gameover, treasure, bg, block;
 
 /*
 Util functions
@@ -53,6 +53,9 @@ function init() {
 
 function handleComplete() {
   newLevel();
+  console.log(stage.getNumChildren());
+  stage.addChild(ninja);
+  console.log(stage.getNumChildren());
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
   createjs.Ticker.addEventListener("tick", tick);
 }
@@ -62,7 +65,7 @@ function enemy() {
 var spriteSheet2 = new createjs.SpriteSheet({
 	framerate: 30,
 	"images": [loader.getResult("enemy1")],
-	"frames": {"height": 64, "width": 64, "regX": 32, "regY": 32},
+	"frames": {"height": 64, "width": 64, "regX": 32, "regY": 64},
 	// define run animation
 	"animations": {
 		"run": [0, 9, "run", .25]
@@ -132,6 +135,7 @@ function createLevel(lvlname){
   stage.addChild(bg);
   treasure = new asset('chest', 32, 80, 900, 610);
   stage.addChild(treasure);
+  hero();
   var wc = 1;
   var hc = 1;
   floorplan = [];
@@ -160,7 +164,7 @@ function createLevel(lvlname){
       } else if (txtout[i] == 'z'){
         var zombie = new enemy();
         zombie.x = wc*32 -16;
-        zombie.y = hc*128 -32;
+        zombie.y = hc*128;
         enemies.push(zombie);
         stage.addChild(zombie);
         block = new asset('floor', 16, 32, wc*32 - 16, (hc*128));
@@ -171,8 +175,6 @@ function createLevel(lvlname){
       }
     }
   });
-  hero();
-  stage.addChild(ninja);
 }
 
   function ninjaJump() {
@@ -308,7 +310,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 		} else {
 			for (var i = 0; i < enemies.length; i++) {
 				if (Math.abs(ninja.x - enemies[i].x) <= 8){
-					if (Math.abs(ninja.y - enemies[i].y) <= 35){
+					if (Math.abs(ninja.y - enemies[i].y) <= 32){
 							createjs.Ticker.removeAllEventListeners(); //stop the ticker
 							gameOverMan();
 					}
@@ -382,6 +384,7 @@ This allows me to easily handle movement, physics, and collision detection on ev
 */
 
   function tick(event) {
+    stage.setChildIndex(ninja,stage.getNumChildren()-1); //put ninja object in the foreground
 		keyInput();
     detectCollison();
 		enemyMovement();
