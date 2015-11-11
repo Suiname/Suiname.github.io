@@ -31,7 +31,9 @@ function init() {
 		{src: "MonsterARun.png", id: "enemy2"},
 		{src: "gameover.jpg", id: "gameover"},
 		{src: "player2.png", id:"player2"},
-		{src: "chest.png", id:"chest"}
+		{src: "chest.png", id:"chest"},
+    {src: "ladder.png", id:"ladder"},
+    {src: "floor.png", id:"floor"}
 	];
 
   loader = new createjs.LoadQueue(false);
