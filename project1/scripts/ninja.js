@@ -4,7 +4,7 @@ var keys = {};
 var activeplayer = 1;
 var enemies =  [];
 var floorplan = [];
-
+var holes = [];
 var level = 1;
 
 /*
@@ -33,13 +33,14 @@ function init() {
 		{src: "gameover.jpg", id: "gameover"},
 		{src: "player2.png", id:"player2"},
 		{src: "chest.png", id:"chest"},
-    {src: "ladder.png", id:"ladder"},
+    {src: "ladder2.png", id:"ladder"},
     {src: "floor.png", id:"floor"},
     {src: "brick.png", id:"brick"},
+    {src: "blank.png", id:"blank"},
     {src: "1.txt", id:"level1"},
     {src: "2.txt", id:"level2"},
     {src: "3.txt", id:"level3"},
-    {src: "win.png", id:"win"}
+    {src: "win.jpg", id:"win"}
 	];
 
   loader = new createjs.LoadQueue(false);
@@ -51,44 +52,11 @@ function init() {
 }
 
 function handleComplete() {
-  var spriteSheet = new createjs.SpriteSheet({
-    framerate: 30,
-    "images": [loader.getResult("ninja")],
-    "frames": {"height": 77, "width": 50, "regX": 25, "regY": 77},
-    // define two animations, run and jump
-    "animations": {
-      "run": [16, 23, "run", .25],
-      "jump": [36, 39, "run", .1]
-    }
-  });
-  createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
-  ninja = new createjs.Sprite(spriteSheet, "run");
-  ninja.y = 16;
-  ninja.x = 5;
-  ninja.falling = false;
-	ninja.direction = "right";
-	ninja.jumpTime = 0;
-
-  treasure = new asset('chest', 32, 80, 600, 100);
-	// enemies = [];
-	// for (var i = 0; i < level; i++){
-	// var newEnemy = new enemy();
-	// newEnemy.x = getRandomIntInclusive(100,w);
-	// enemies.push(newEnemy);
-	// }
-  bg = new createjs.Shape();
-  bg.graphics.beginBitmapFill(loader.getResult("brick")).drawRect(0, 0, w, h);
-  stage.addChild(bg);
   newLevel();
-	stage.addChild(treasure);
-  stage.addChild(ninja);
-	for (var i in enemies) {
-		stage.addChild(enemies[i]);
-	}
-
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
   createjs.Ticker.addEventListener("tick", tick);
 }
+
 
 function enemy() {
 var spriteSheet2 = new createjs.SpriteSheet({
@@ -158,10 +126,17 @@ function newLevel(lvlname){
 }
 
 function createLevel(lvlname){
+
+  bg = new createjs.Shape();
+  bg.graphics.beginBitmapFill(loader.getResult("brick")).drawRect(0, 0, w, h);
+  stage.addChild(bg);
+  treasure = new asset('chest', 32, 80, 900, 610);
+  stage.addChild(treasure);
   var wc = 1;
   var hc = 1;
   floorplan = [];
   enemies = [];
+  holes = [];
   $.get(lvlname, function(data) {
     var txtout = data;
     for (var i in txtout) {
@@ -179,6 +154,8 @@ function createLevel(lvlname){
         floorplan.push(block);
         wc++;
       } else if (txtout[i] == '|') {
+        block = new asset('blank', 16, 32, wc*32 - 16, (hc*128));
+        holes.push(block);
         wc++;
       } else if (txtout[i] == 'z'){
         var zombie = new enemy();
@@ -194,6 +171,8 @@ function createLevel(lvlname){
       }
     }
   });
+  hero();
+  stage.addChild(ninja);
 }
 
   function ninjaJump() {
@@ -269,6 +248,19 @@ function createLevel(lvlname){
   }
 
 	function enemyMovement(){
+    for (var j in holes){
+      for (var i in enemies){
+        if ((Math.abs(enemies[i].x - holes[j].x) <= 16) && (Math.abs(enemies[i].y - holes[j].y) <= 50) && enemies[i].direction == 'left') {
+          enemies[i].direction = 'right';
+          enemies[i].gotoAndPlay('run_h');
+        } else if ((Math.abs(enemies[i].x - holes[j].x) <= 16) && (Math.abs(enemies[i].y - holes[j].y) <= 50) && enemies[i].direction == 'right') {
+          enemies[i].direction = 'left';
+          enemies[i].gotoAndPlay('run');
+        }
+      }
+    }
+
+
 		for (var i in enemies) {
 					if (enemies[i].x < 32 && enemies[i].direction == 'left') {
 						enemies[i].x++;
@@ -315,8 +307,8 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 			}
 		} else {
 			for (var i = 0; i < enemies.length; i++) {
-				if (Math.abs(ninja.x - enemies[i].x) <= 15){
-					if (Math.abs(ninja.y - enemies[i].y) <= 50){
+				if (Math.abs(ninja.x - enemies[i].x) <= 8){
+					if (Math.abs(ninja.y - enemies[i].y) <= 35){
 							createjs.Ticker.removeAllEventListeners(); //stop the ticker
 							gameOverMan();
 					}
@@ -332,7 +324,9 @@ which stops the ticker (animation engine) then calls the gameOverMan method
  */
 	function gameOverMan() {
 		if (activeplayer == 1) {
-			stage.removeChild(ninja);
+			stage.removeAllChildren();
+      stage.removeAllEventListeners();
+      createjs.Ticker.removeAllEventListeners();
 			nextPlayer();
 		} else if(activeplayer == 2){
 			//display game over screen
@@ -347,6 +341,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 
 //resets the canvas object, loads the 2nd player ready screen, sets the active player value to 2 and calls init
 	function nextPlayer(){
+//stage remove all listeners
 		stage = new createjs.Stage("testCanvas");
 		var p2image = new createjs.Bitmap(loader.getResult("player2"));
 		stage.addChild(p2image);
