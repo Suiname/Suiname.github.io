@@ -1,12 +1,18 @@
-var stage, w, h, loader, level;
+var stage, w, h, loader, level, time;
 var keys = {};
 var activeplayer = 1;
 var enemies =  [];
 var floorplan = [];
 var holes = [];
+var ladders = [];
 var level = 1;
 var ninja, gameover, treasure, bg, block;
-
+var p1, p2;
+p1 = {};
+p2 = {};
+p1.score = 0;
+p2.score = 0;
+var p1Display, p2Display, hud;
 /*
 Util functions
 */
@@ -19,6 +25,9 @@ function resetAll(){
 	activeplayer = 1;
 	enemies = [];
 	level = 1;
+  p1.score = 0;
+  p2.score = 0;
+  time = 999;
 }
 
 
@@ -53,9 +62,7 @@ function init() {
 
 function handleComplete() {
   newLevel();
-  console.log(stage.getNumChildren());
   stage.addChild(ninja);
-  console.log(stage.getNumChildren());
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
   createjs.Ticker.addEventListener("tick", tick);
 }
@@ -112,6 +119,20 @@ function asset(assetType, assetHeight, assetWidth, assetX, assetY){
   return result;
 }
 
+function textField(datText, xCoord, yCoord, alignment){
+  var messageField;
+  messageField = new createjs.Text(datText, "bold 24px Arial", "#14f509");
+  messageField.maxWidth = 1000;
+  messageField.textAlign = alignment;
+  messageField.textBaseline = "top";
+  messageField.x = xCoord;
+  messageField.y = yCoord;
+  messageField.regX = 0;
+  messageField.regY = 0;
+  stage.addChild(messageField);
+  return messageField;
+}
+
 function newLevel(lvlname){
   switch (level) {
     case 1:
@@ -129,13 +150,16 @@ function newLevel(lvlname){
 }
 
 function createLevel(lvlname){
-
+  p1Display = new textField('Player 1\rScore: ' + p1.score, 0, 20, 'left');
+  p2Display = new textField('Player 2\rScore: ' + p2.score, stage.canvas.width, 20, 'right');
+  time = 999;
+  hud = new textField('Time:\r' + time, stage.canvas.width/2, 20, 'center');
   bg = new createjs.Shape();
   bg.graphics.beginBitmapFill(loader.getResult("brick")).drawRect(0, 0, w, h);
   stage.addChild(bg);
   treasure = new asset('chest', 32, 80, 900, 625);
   treasure.regY = 16;
-  stage.addChild(treasure);
+  stage.addChild(treasure, p1Display, p2Display, hud);
   hero();
   var wc = 1;
   var hc = 1;
@@ -304,7 +328,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 */
 	function detectCollison() {
 		if (Math.abs(ninja.x - treasure.x) <= 5){
-			if(Math.abs(ninja.y - treasure.y) <= 13){
+			if(Math.abs(ninja.y - treasure.y) <= 14){
 				createjs.Ticker.removeAllEventListeners(); //stop the ticker
 				nextLevel();
 			}
@@ -355,8 +379,10 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 
 	function nextLevel(){
     if(level == 3){
+      updateScore();
       youWin();
     } else {
+      updateScore()
       level++;
   		init();
     }
@@ -366,6 +392,13 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 		activeplayer = 2;
 	}
 
+  function updateScore(){
+    if (activeplayer == 1) {
+      p1.score += parseInt(time);
+    } else {
+      p2.score += parseInt(time);
+    }
+  }
   function youWin(){
     stage = new createjs.Stage("testCanvas");
     var winimage = new createjs.Bitmap(loader.getResult("win"));
@@ -375,6 +408,15 @@ which stops the ticker (animation engine) then calls the gameOverMan method
     } else {
       //results screen
     }
+  }
+
+  function timer() {
+    if (time >= 0) {
+        time-= .1;
+    } else {
+      time = 0;
+    }
+    hud.text = 'Time:\r' + parseInt(time);
   }
 
 /*
@@ -390,5 +432,6 @@ This allows me to easily handle movement, physics, and collision detection on ev
     detectCollison();
 		enemyMovement();
 		gravityCheck();
+    timer();
   	stage.update(event);
   }
