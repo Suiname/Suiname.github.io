@@ -49,7 +49,8 @@ function init() {
     {src: "1.txt", id:"level1"},
     {src: "2.txt", id:"level2"},
     {src: "3.txt", id:"level3"},
-    {src: "win.jpg", id:"win"}
+    {src: "win.jpg", id:"win"},
+    {src: "results.png", id:"results"}
 	];
 
   loader = new createjs.LoadQueue(false);
@@ -355,25 +356,18 @@ which stops the ticker (animation engine) then calls the gameOverMan method
  is playing, it loads the game over screen.
  */
 	function gameOverMan() {
+    stage.removeAllChildren();
+    stage.removeAllEventListeners();
+    createjs.Ticker.removeAllEventListeners();
 		if (activeplayer == 1) {
-			stage.removeAllChildren();
-      stage.removeAllEventListeners();
-      createjs.Ticker.removeAllEventListeners();
 			nextPlayer();
 		} else if(activeplayer == 2){
-			//display game over screen
-		  stage = new createjs.Stage("testCanvas");
-			var goimage = new createjs.Bitmap(loader.getResult("gameover"));
-			stage.addChild(goimage);
-			resetAll();
+      results();
 		}
-
-
 	}
 
 //resets the canvas object, loads the 2nd player ready screen, sets the active player value to 2 and calls init
 	function nextPlayer(){
-//stage remove all listeners
 		stage = new createjs.Stage("testCanvas");
 		var p2image = new createjs.Bitmap(loader.getResult("player2"));
 		stage.addChild(p2image);
@@ -411,7 +405,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
     if (activeplayer == 1) {
       window.setTimeout(nextPlayer, 4000);
     } else {
-      //results screen
+      results();
     }
   }
 
@@ -424,6 +418,24 @@ which stops the ticker (animation engine) then calls the gameOverMan method
     hud.text = 'Time:\r' + parseInt(time);
   }
 
+  function results(){
+    var resultsText, textBox, goText;
+    stage = new createjs.Stage("testCanvas");
+    var resultsImage = new createjs.Bitmap(loader.getResult("results"));
+    if (p1.score > p2.score) {
+      resultsText = 'Player 1 wins!';
+    } else if (p2.score > p1.score){
+      resultsText = 'Player 2 wins!';
+    } else {
+      resultsText = 'It was a draw!';
+    }
+    goText = new textField('Game Over', 40, 120, 'left')
+    goText.color = '#bad94a';
+    textBox = new textField(resultsText, 40, 220, 'left');
+    textBox.color = '#bad94a';
+    stage.addChild(resultsImage, goText, textBox);
+    resetAll();
+  }
 /*
 This is the most important function, it is basically the entire animation engine.
 easel allows for the creation of a ticket event object, which basically calls this
