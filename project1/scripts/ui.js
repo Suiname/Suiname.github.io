@@ -8,7 +8,7 @@
       start();
     });
 
-		function init() {
+		function start() {
 			canvas = document.getElementById("testCanvas");
 
 			//DOMElement creation

@@ -17,6 +17,48 @@ var p1Display, p2Display, hud;
 Util functions
 */
 
+$(document).ready(function() {
+  start();
+});
+
+function start() {
+  canvas = document.getElementById("testCanvas");
+
+  //DOMElement creation
+  form = document.getElementById("myform");
+  form.style.display = 'block';
+  formDOMElement = new createjs.DOMElement(form);
+  //move it's rotation center at the center of the form
+  formDOMElement.regX = form.offsetWidth*0.5;
+  formDOMElement.regY = form.offsetHeight*0.5;
+  //move the form above the screen
+  formDOMElement.x = canvas.width * 0.5;
+  formDOMElement.y = - 200;
+
+  stage = new createjs.Stage(canvas);
+
+  formDOMElement.x = stage.canvas.width * 0.5;
+  formDOMElement.y = - 200;
+  //add the formDOMElement to the display list
+  stage.addChild(formDOMElement);
+
+  createjs.Ticker.setFPS(24);
+  createjs.Ticker.addEventListener("tick", stage);
+
+  //Apply a tween to the form
+  createjs.Tween.get(formDOMElement).to({x:300, y:200, rotation:720},2000, createjs.Ease.cubicOut);
+  // stage.addChild(formDOMElement);
+}
+
+function subfunc(){
+  stage.removeAllEventListeners();
+  form.style.display = 'none';
+  console.log($('#p1name').val());
+  p1.playername = $('#p1name').val();
+  p2.playername = $('#p2name').val();
+  init();
+}
+
 function getRandomIntInclusive(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -63,20 +105,21 @@ function init() {
 }
 
 function handleComplete() {
-  // newLevel();
+  newLevel();
   // results();
   // nextPlayer();
-  pinit();
-  // stage.addChild(ninja);
-  // createjs.Ticker.timingMode = createjs.Ticker.RAF;
-  // createjs.Ticker.addEventListener("tick", tick);
+  // pinit();
+  stage.addChild(ninja);
+  createjs.Ticker.timingMode = createjs.Ticker.RAF;
+  createjs.Ticker.addEventListener("tick", tick);
 }
+//
+// function pinit(){
+//   stage = new createjs.Stage("testCanvas");
+//   var winimage = new createjs.Bitmap(loader.getResult("first"));
+//   stage.addChild(winimage);
+// }
 
-function pinit(){
-  stage = new createjs.Stage("testCanvas");
-  var winimage = new createjs.Bitmap(loader.getResult("first"));
-  stage.addChild(winimage);
-}
 function enemy() {
 var spriteSheet2 = new createjs.SpriteSheet({
 	framerate: 30,
@@ -159,8 +202,8 @@ function newLevel(lvlname){
 }
 
 function createLevel(lvlname){
-  p1Display = new textField('Player 1\rScore: ' + p1.score, 0, 10, 'left');
-  p2Display = new textField('Player 2\rScore: ' + p2.score, stage.canvas.width, 10, 'right');
+  p1Display = new textField(p1.playername + '\rScore: ' + p1.score, 0, 10, 'left');
+  p2Display = new textField(p2.playername + '\rScore: ' + p2.score, stage.canvas.width, 10, 'right');
   time = 999;
   hud = new textField('Time:\r' + time, stage.canvas.width/2, 10, 'center');
   bg = new createjs.Shape();
@@ -431,9 +474,9 @@ which stops the ticker (animation engine) then calls the gameOverMan method
     stage = new createjs.Stage("testCanvas");
     var resultsImage = new createjs.Bitmap(loader.getResult("results"));
     if (p1.score > p2.score) {
-      resultsText = 'Player 1 wins!';
+      resultsText = p1.playername + ' wins!';
     } else if (p2.score > p1.score){
-      resultsText = 'Player 2 wins!';
+      resultsText = p2.playername + ' wins!';
     } else {
       resultsText = 'It was a draw!';
     }
@@ -452,7 +495,7 @@ This allows me to easily handle movement, physics, and collision detection on ev
 */
 
   function tick(event) {
-    // stage.setChildIndex(ninja,stage.getNumChildren()-1); //put ninja object in the foreground
+    stage.setChildIndex(ninja,stage.getNumChildren()-1); //put ninja object in the foreground
 		keyInput();
     detectCollison();
 		enemyMovement();
