@@ -6,12 +6,28 @@
     <link rel="stylesheet" href="styles/style.css" media="screen" title="no title" charset="utf-8">
   </head>
   <body>
+    <form id="myform">
+                    <label for="p1name">Enter Player 1's name:</label>
+                    <input type="text" id="p1name"><br>
+                    <label for="p2name">Enter Player 2's name:</label>
+                    <input type="text"  id="p2name"/><br>
+                    <br>
+                    <p id="submit" >
+                        <input type="submit" value="Submit"/>
+                    </p>
+    </form>
     <canvas id="testCanvas" width="1000" height="750"></canvas>
-    <button type="button" name="button" onclick="resetAll(); init();">Start</button>
-    <button type="button" name="button" onclick="nextLevel();">Next Level</button>
+
+      <button type="button" name="button" onclick="init();">Start</button>
+      <button type="button" name="button" onclick="nextLevel();">Next Level</button>
+
+
+
     <script src="scripts/createjs-2015.05.21.min.js"></script>
+    <!-- <script src="http://code.createjs.com/easeljs-0.4.2.min.js"></script> -->
+		<!-- <script src="http://code.createjs.com/tweenjs-0.2.0.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/EaselJS/0.8.0/easeljs.min.js"></script> -->
-    <script src="scripts/ninja.js"></script>
+    <script src="scripts/test.js"></script>
   </body>
 </html>

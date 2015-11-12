@@ -50,7 +50,8 @@ function init() {
     {src: "2.txt", id:"level2"},
     {src: "3.txt", id:"level3"},
     {src: "win.jpg", id:"win"},
-    {src: "results.png", id:"results"}
+    {src: "results.png", id:"results"},
+    {src: "setup.jpg", id:"first"}
 	];
 
   loader = new createjs.LoadQueue(false);
@@ -62,13 +63,20 @@ function init() {
 }
 
 function handleComplete() {
-  newLevel();
-  stage.addChild(ninja);
-  createjs.Ticker.timingMode = createjs.Ticker.RAF;
-  createjs.Ticker.addEventListener("tick", tick);
+  // newLevel();
+  // results();
+  // nextPlayer();
+  pinit();
+  // stage.addChild(ninja);
+  // createjs.Ticker.timingMode = createjs.Ticker.RAF;
+  // createjs.Ticker.addEventListener("tick", tick);
 }
 
-
+function pinit(){
+  stage = new createjs.Stage("testCanvas");
+  var winimage = new createjs.Bitmap(loader.getResult("first"));
+  stage.addChild(winimage);
+}
 function enemy() {
 var spriteSheet2 = new createjs.SpriteSheet({
 	framerate: 30,
@@ -444,7 +452,7 @@ This allows me to easily handle movement, physics, and collision detection on ev
 */
 
   function tick(event) {
-    stage.setChildIndex(ninja,stage.getNumChildren()-1); //put ninja object in the foreground
+    // stage.setChildIndex(ninja,stage.getNumChildren()-1); //put ninja object in the foreground
 		keyInput();
     detectCollison();
 		enemyMovement();

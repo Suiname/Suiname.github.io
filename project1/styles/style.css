@@ -1,0 +1,23 @@
+form{
+    display: none;
+    font-size: 0.8em;
+    width: 300px;
+    background-color: rgb(26, 219, 26);
+    margin: auto;
+    padding: 10px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #0099FF;
+    text-align: left;
+    color: #e61010;
+    opacity:0;
+}
+canvas{
+}
+
+button{
+  clear: both;
+}
+#submit{
+    text-align: right;
+}
