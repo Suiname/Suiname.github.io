@@ -147,7 +147,8 @@ function hero(){
     // define two animations, run and jump
     "animations": {
       "run": [16, 23, "run", .25],
-      "jump": [36, 39, "run", .1]
+      "jump": [36, 39, "run", .1],
+      "climb": [4, 7, "climb", .1]
     }
   });
   createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
@@ -155,6 +156,7 @@ function hero(){
   ninja.y = 16;
   ninja.x = 5;
   ninja.falling = false;
+  ninja.climbing = false;
   ninja.direction = "right";
   ninja.jumpTime = 0;
 }
@@ -278,18 +280,43 @@ function createLevel(lvlname){
 		}
 	}
 
-  function ninjaClimb(){
+  function ninjaClimbDown(){
     var climbable = 0;
     for (var i = 0; i < ladders.length; i++) {
-      if ((Math.abs(ninja.x - ladders[i].x) <= 10) && (Math.abs(ninja.y - ladders[i].y) <= 1)) {
+      if ((Math.abs(ninja.x - ladders[i].x) <= 10) && (Math.abs(ninja.y - ladders[i].y) <= 10)) {
         climbable += 1;
       }
     }
-    if(climbable > 0){
+    if (ninja.climbing == true && ninja.falling == true) {
+      climbable++;
+    }
+    if(climbable > 0 && ninja.jumpTime == 0){
       ninja.y += 2;
+      if (ninja.climbing == false){
+      ninja.gotoAndPlay('climb');
+      }
       ninja.climbing = true;
     }
   }
+
+  function ninjaClimbUp(){
+    var climbable = 0;
+    for (var i = 0; i < ladders.length; i++) {
+      if ((Math.abs(ninja.x - ladders[i].x) <= 10) && (Math.abs(ninja.y - ladders[i].y) == 128)){
+        climbable += 1;
+      }
+    }
+    if (ninja.climbing == true && ninja.falling == true) {
+      climbable++;
+    }
+    if(climbable > 0 && ninja.y >= 130 && ninja.jumpTime == 0){
+      ninja.y -= 2;
+      if (ninja.climbing == false){
+      ninja.gotoAndPlay('climb');
+      }
+      ninja.climbing = true;
+    }
+}
 
   function ninjaFall(){
     var grounded = 0;
@@ -300,7 +327,9 @@ function createLevel(lvlname){
       }
     }
     if(grounded == 0){
-      ninja.y +=2;
+      if (ninja.climbing == false) {
+        ninja.y +=2;
+      }
       ninja.falling = true;
     }
 
@@ -327,26 +356,48 @@ function createLevel(lvlname){
 	}
 
   function ninjaRight(){
-    if (ninja.x < w - 15){
+    if (ninja.x < w - 15 && ninja.climbing == false){
     ninja.x += 1.5;
     }
-		if (ninja.direction == "left" && ninja.jumpTime == 0) {
+		if (ninja.direction == "left" && ninja.jumpTime == 0 && ninja.climbing == false) {
 			ninja.gotoAndPlay("run");
 			ninja.direction = "right";
-		}
+		} else if (ninja.climbing == true && ninja.falling == true) {
+      ninja.gotoAndPlay("run");
+			ninja.direction = "right";
+      ninja.climbing = false;
+      ninja.x += 1.5;
+		} else if (ninja.climbing == true){
+      ninja.gotoAndPlay("run");
+			ninja.direction = "right";
+      ninja.climbing = false;
+      ninja.x += 1.5;
+      ninja.falling = true;
+    }
+
 
   }
 
   function ninjaLeft(){
-    if (ninja.x > 15){
+    if (ninja.x > 15 && ninja.climbing == false){
     ninja.x -= 1.5;
     }
 
-		if (ninja.direction == "right" && ninja.jumpTime == 0) {
+		if (ninja.direction == "right" && ninja.jumpTime == 0 && ninja.climbing == false) {
 			ninja.gotoAndPlay("run_h");
 			ninja.direction = "left";
-		}
-
+		} else if (ninja.climbing == true && ninja.falling == true) {
+      ninja.gotoAndPlay("run_h");
+			ninja.direction = "left";
+      ninja.climbing = false;
+      ninja.x -= 1.5;
+    } else if (ninja.climbing == true){
+      ninja.gotoAndPlay("run");
+			ninja.direction = "right";
+      ninja.climbing = false;
+      ninja.x += 1.5;
+      ninja.falling = true;
+    }
   }
 
 	function enemyMovement(){
@@ -392,7 +443,8 @@ function createLevel(lvlname){
 		if(keys[39] || keys[68]){ninjaRight();}
 		if(keys[37] || keys[65]){ninjaLeft();}
 		if(keys[16]){if (ninja.jumpTime == 0 && ninja.falling == false) {ninjaJump();}}
-    if(keys[40] || keys[83]){ninjaClimb();}
+    if(keys[40] || keys[83]){ninjaClimbDown();}
+    if(keys[87] || keys[38]){ninjaClimbUp();}
 	}
 
 /*
