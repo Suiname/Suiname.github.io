@@ -527,7 +527,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
     if (activeplayer == 1) {
       window.setTimeout(nextPlayer, 4000);
     } else {
-      window.setTimeout(results, 4000);
+      results();
     }
   }
 

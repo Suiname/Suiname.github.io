@@ -5,19 +5,4 @@ My name is Jason, this is my project space.  Here is a picture of me and my spir
 
 ![Me and the ODB](ODBnme.jpg)
 
-below are some details about my project:
-
-I haven't done anything yet...
-
-1. pizza
-  * deep dish
-  * NYC style
-  * New Haven style
-2. not pizza
-  * other stuff
-
-```html
-<html>
-this
-</html>
-```
+My First project, a platformer, is available here - http://suiname.github.io/project1 and the source code is available here - https://github.com/Suiname/Suiname.github.io/tree/master/project1
