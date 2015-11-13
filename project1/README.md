@@ -1,4 +1,5 @@
 This game is a simple platformer I made using HTML, CSS and Javascript.  To create it, I used the following tools:
+
 1. a canvas HTML object.
 2. a javascript library called createjs which contains easel and tween which I used to animate the canvas and DOMelements.
 3. jquery for accessing dom elements quickly.
