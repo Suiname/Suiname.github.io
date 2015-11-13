@@ -68,6 +68,9 @@ function getRandomIntInclusive(min, max) {
 function resetAll(){
 	activeplayer = 1;
 	enemies = [];
+  holes = [];
+  floorplan = [];
+  ladders = [];
 	level = 1;
   p1.score = 0;
   p2.score = 0;
@@ -551,6 +554,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
     } else {
       resultsText = 'It was a draw!';
     }
+    resetAll();
     goText = new textField('Game Over', 40, 120, 'left')
     goText.color = '#bad94a';
     textBox = new textField(resultsText, 40, 220, 'left');
@@ -559,7 +563,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
     paText.color = '#bad94a';
     paText.addEventListener("click", init);
     stage.addChild(resultsImage, goText, textBox, paText);
-    resetAll();
+
   }
 /*
 This is the most important function, it is basically the entire animation engine.
