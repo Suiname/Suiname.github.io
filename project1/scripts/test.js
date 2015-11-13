@@ -462,8 +462,8 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 			}
 		} else {
 			for (var i = 0; i < enemies.length; i++) {
-				if (Math.abs(ninja.x - enemies[i].x) <= 8){
-					if (Math.abs(ninja.y - enemies[i].y) <= 32){
+				if (Math.abs(ninja.x - enemies[i].x) <= 10){
+					if (Math.abs(ninja.y - enemies[i].y) <= 38){
 							createjs.Ticker.removeAllEventListeners(); //stop the ticker
 							gameOverMan();
 					}
