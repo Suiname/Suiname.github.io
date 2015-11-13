@@ -17,6 +17,51 @@ var p1Display, p2Display, hud;
 Util functions
 */
 
+$(document).ready(function() {
+  start();
+});
+
+function start() {
+  canvas = document.getElementById("testCanvas");
+
+  //DOMElement creation
+  form = document.getElementById("myform");
+  $('#myform').css('display', 'block');
+  formDOMElement = new createjs.DOMElement(form);
+  //move it's rotation center at the center of the form
+  formDOMElement.regX = form.offsetWidth*0.5;
+  formDOMElement.regY = form.offsetHeight*0.5;
+  //move the form above the screen
+  formDOMElement.x = canvas.width * 0.5;
+  formDOMElement.y = - 200;
+
+  stage = new createjs.Stage(canvas);
+
+  formDOMElement.x = stage.canvas.width * 0.5;
+  formDOMElement.y = - 200;
+  //add the formDOMElement to the display list
+  stage.addChild(formDOMElement);
+  createjs.Ticker.setFPS(24);
+  createjs.Ticker.addEventListener("tick", stage);
+
+
+
+  //Apply a tween to the form
+  createjs.Tween.get(formDOMElement).to({x:stage.canvas.width/2, y:150, rotation:720},2000, createjs.Ease.cubicOut);
+
+  // stage.addChild(formDOMElement);
+  stage.addChild()
+}
+
+function subfunc(){
+  stage.removeAllEventListeners();
+  $('#myform').css('display', 'none');
+  p1.playername = $('#p1name').val();
+  p2.playername = $('#p2name').val();
+  $('#rules').css('display', 'none');
+  init();
+}
+
 function getRandomIntInclusive(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -50,7 +95,8 @@ function init() {
     {src: "2.txt", id:"level2"},
     {src: "3.txt", id:"level3"},
     {src: "win.jpg", id:"win"},
-    {src: "results.png", id:"results"}
+    {src: "results.png", id:"results"},
+    {src: "setup.jpg", id:"first"}
 	];
 
   loader = new createjs.LoadQueue(false);
@@ -63,11 +109,19 @@ function init() {
 
 function handleComplete() {
   newLevel();
+  // results();
+  // nextPlayer();
+  // pinit();
   stage.addChild(ninja);
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
   createjs.Ticker.addEventListener("tick", tick);
 }
-
+//
+// function pinit(){
+//   stage = new createjs.Stage("testCanvas");
+//   var winimage = new createjs.Bitmap(loader.getResult("first"));
+//   stage.addChild(winimage);
+// }
 
 function enemy() {
 var spriteSheet2 = new createjs.SpriteSheet({
@@ -93,7 +147,8 @@ function hero(){
     // define two animations, run and jump
     "animations": {
       "run": [16, 23, "run", .25],
-      "jump": [36, 39, "run", .1]
+      "jump": [36, 39, "run", .1],
+      "climb": [4, 7, "climb", .1]
     }
   });
   createjs.SpriteSheetUtils.addFlippedFrames(spriteSheet, true, false, false);
@@ -101,6 +156,7 @@ function hero(){
   ninja.y = 16;
   ninja.x = 5;
   ninja.falling = false;
+  ninja.climbing = false;
   ninja.direction = "right";
   ninja.jumpTime = 0;
 }
@@ -122,7 +178,7 @@ function asset(assetType, assetHeight, assetWidth, assetX, assetY){
 
 function textField(datText, xCoord, yCoord, alignment){
   var messageField;
-  messageField = new createjs.Text(datText, "bold 24px Arial", "#14f509");
+  messageField = new createjs.Text(datText, "bold 24px Arial", "#000000");
   messageField.maxWidth = 1000;
   messageField.textAlign = alignment;
   messageField.textBaseline = "top";
@@ -151,8 +207,8 @@ function newLevel(lvlname){
 }
 
 function createLevel(lvlname){
-  p1Display = new textField('Player 1\rScore: ' + p1.score, 0, 10, 'left');
-  p2Display = new textField('Player 2\rScore: ' + p2.score, stage.canvas.width, 10, 'right');
+  p1Display = new textField(p1.playername + '\rScore: ' + p1.score, 0, 10, 'left');
+  p2Display = new textField(p2.playername + '\rScore: ' + p2.score, stage.canvas.width, 10, 'right');
   time = 999;
   hud = new textField('Time:\r' + time, stage.canvas.width/2, 10, 'center');
   bg = new createjs.Shape();
@@ -164,6 +220,7 @@ function createLevel(lvlname){
   hero();
   var wc = 1;
   var hc = 1;
+  ladders = [];
   floorplan = [];
   enemies = [];
   holes = [];
@@ -182,6 +239,7 @@ function createLevel(lvlname){
         block = new asset('ladder', 128, 64, wc*32 - 16, (hc*128));
         stage.addChild(block);
         floorplan.push(block);
+        ladders.push(block);
         wc++;
       } else if (txtout[i] == '|') {
         block = new asset('blank', 16, 32, wc*32 - 16, (hc*128));
@@ -222,6 +280,44 @@ function createLevel(lvlname){
 		}
 	}
 
+  function ninjaClimbDown(){
+    var climbable = 0;
+    for (var i = 0; i < ladders.length; i++) {
+      if ((Math.abs(ninja.x - ladders[i].x) <= 10) && (Math.abs(ninja.y - ladders[i].y) <= 10)) {
+        climbable += 1;
+      }
+    }
+    if (ninja.climbing == true && ninja.falling == true) {
+      climbable++;
+    }
+    if(climbable > 0 && ninja.jumpTime == 0){
+      ninja.y += 2;
+      if (ninja.climbing == false){
+      ninja.gotoAndPlay('climb');
+      }
+      ninja.climbing = true;
+    }
+  }
+
+  function ninjaClimbUp(){
+    var climbable = 0;
+    for (var i = 0; i < ladders.length; i++) {
+      if ((Math.abs(ninja.x - ladders[i].x) <= 10) && (Math.abs(ninja.y - ladders[i].y) == 128)){
+        climbable += 1;
+      }
+    }
+    if (ninja.climbing == true && ninja.falling == true) {
+      climbable++;
+    }
+    if(climbable > 0 && ninja.y >= 130 && ninja.jumpTime == 0){
+      ninja.y -= 2;
+      if (ninja.climbing == false){
+      ninja.gotoAndPlay('climb');
+      }
+      ninja.climbing = true;
+    }
+}
+
   function ninjaFall(){
     var grounded = 0;
     ninja.falling = false;
@@ -231,7 +327,9 @@ function createLevel(lvlname){
       }
     }
     if(grounded == 0){
-      ninja.y +=2;
+      if (ninja.climbing == false) {
+        ninja.y +=2;
+      }
       ninja.falling = true;
     }
 
@@ -258,26 +356,48 @@ function createLevel(lvlname){
 	}
 
   function ninjaRight(){
-    if (ninja.x < w - 15){
+    if (ninja.x < w - 15 && ninja.climbing == false){
     ninja.x += 1.5;
     }
-		if (ninja.direction == "left" && ninja.jumpTime == 0) {
+		if (ninja.direction == "left" && ninja.jumpTime == 0 && ninja.climbing == false) {
 			ninja.gotoAndPlay("run");
 			ninja.direction = "right";
-		}
+		} else if (ninja.climbing == true && ninja.falling == true) {
+      ninja.gotoAndPlay("run");
+			ninja.direction = "right";
+      ninja.climbing = false;
+      ninja.x += 1.5;
+		} else if (ninja.climbing == true){
+      ninja.gotoAndPlay("run");
+			ninja.direction = "right";
+      ninja.climbing = false;
+      ninja.x += 1.5;
+      ninja.falling = true;
+    }
+
 
   }
 
   function ninjaLeft(){
-    if (ninja.x > 15){
+    if (ninja.x > 15 && ninja.climbing == false){
     ninja.x -= 1.5;
     }
 
-		if (ninja.direction == "right" && ninja.jumpTime == 0) {
+		if (ninja.direction == "right" && ninja.jumpTime == 0 && ninja.climbing == false) {
 			ninja.gotoAndPlay("run_h");
 			ninja.direction = "left";
-		}
-
+		} else if (ninja.climbing == true && ninja.falling == true) {
+      ninja.gotoAndPlay("run_h");
+			ninja.direction = "left";
+      ninja.climbing = false;
+      ninja.x -= 1.5;
+    } else if (ninja.climbing == true){
+      ninja.gotoAndPlay("run");
+			ninja.direction = "right";
+      ninja.climbing = false;
+      ninja.x += 1.5;
+      ninja.falling = true;
+    }
   }
 
 	function enemyMovement(){
@@ -320,9 +440,11 @@ function createLevel(lvlname){
   }
 
 	function keyInput(){
-		if(keys[39]){ninjaRight();}
-		if(keys[37]){ninjaLeft();}
-		if(keys[38]){if (ninja.jumpTime == 0 && ninja.falling == false) {ninjaJump();}}
+		if(keys[39] || keys[68]){ninjaRight();}
+		if(keys[37] || keys[65]){ninjaLeft();}
+		if(keys[16]){if (ninja.jumpTime == 0 && ninja.falling == false) {ninjaJump();}}
+    if(keys[40] || keys[83]){ninjaClimbDown();}
+    if(keys[87] || keys[38]){ninjaClimbUp();}
 	}
 
 /*
@@ -340,8 +462,8 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 			}
 		} else {
 			for (var i = 0; i < enemies.length; i++) {
-				if (Math.abs(ninja.x - enemies[i].x) <= 8){
-					if (Math.abs(ninja.y - enemies[i].y) <= 32){
+				if (Math.abs(ninja.x - enemies[i].x) <= 10){
+					if (Math.abs(ninja.y - enemies[i].y) <= 38){
 							createjs.Ticker.removeAllEventListeners(); //stop the ticker
 							gameOverMan();
 					}
@@ -423,9 +545,9 @@ which stops the ticker (animation engine) then calls the gameOverMan method
     stage = new createjs.Stage("testCanvas");
     var resultsImage = new createjs.Bitmap(loader.getResult("results"));
     if (p1.score > p2.score) {
-      resultsText = 'Player 1 wins!';
+      resultsText = p1.playername + ' wins!';
     } else if (p2.score > p1.score){
-      resultsText = 'Player 2 wins!';
+      resultsText = p2.playername + ' wins!';
     } else {
       resultsText = 'It was a draw!';
     }
