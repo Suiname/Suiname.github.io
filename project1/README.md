@@ -20,6 +20,8 @@ The real challenges were to figure out how to make a collision detection engine 
 I did try to use the sound library included in createjs to add sound effects to the gameplay, however I just didn't have enough time to do so.  If I were to keep working on this that is definitely what I'd tackle next. In addition, since I only had ~3 days to complete this project, a lot of the code isn't as efficient as it could be, I'd definitely refactor it and write a lot more comments if I had more time.
 
 ## Sources
+Createjs javascript library including easel and tween, which was used for all animation can be found here - http://www.createjs.com/
+
 All art is open source and was discovered and obtained at http://opengameart.org
 * Zombie animation - http://opengameart.org/content/zombie-animations
 * Castle background and platforms - http://opengameart.org/content/2d-castle-platformer-starter-assets
