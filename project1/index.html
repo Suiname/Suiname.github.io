@@ -7,15 +7,16 @@
   </head>
   <body>
     <form id="myform">
-                    <label for="p1name">Enter Player 1's name:</label>
-                    <input type="text" id="p1name"><br>
-                    <label for="p2name">Enter Player 2's name:</label>
-                    <input type="text"  id="p2name"/><br>
+                    <label for="p1name">Player 1's name:</label>
+                    <input type="text" id="p1name" maxlength="10"><br>
+                    <label for="p2name">Player 2's name:</label>
+                    <input type="text" id="p2name" maxlength="10"><br>
                     <br>
-                    <p id="submit" >
+                    <p id="submit">
                       <input type="button" value="Submit" onclick="subfunc();">
                     </p>
     </form>
+    <img src="img/instructions.jpg" id="rules">
     <canvas id="testCanvas" width="1000" height="750"></canvas>
 
 <!-- <button type="button" name="button" onclick="init();">Start</button>

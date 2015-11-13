@@ -26,7 +26,7 @@ function start() {
 
   //DOMElement creation
   form = document.getElementById("myform");
-  form.style.display = 'block';
+  $('#myform').css('display', 'block');
   formDOMElement = new createjs.DOMElement(form);
   //move it's rotation center at the center of the form
   formDOMElement.regX = form.offsetWidth*0.5;
@@ -41,21 +41,24 @@ function start() {
   formDOMElement.y = - 200;
   //add the formDOMElement to the display list
   stage.addChild(formDOMElement);
-
   createjs.Ticker.setFPS(24);
   createjs.Ticker.addEventListener("tick", stage);
 
+
+
   //Apply a tween to the form
-  createjs.Tween.get(formDOMElement).to({x:300, y:200, rotation:720},2000, createjs.Ease.cubicOut);
+  createjs.Tween.get(formDOMElement).to({x:stage.canvas.width/2, y:150, rotation:720},2000, createjs.Ease.cubicOut);
+
   // stage.addChild(formDOMElement);
+  stage.addChild()
 }
 
 function subfunc(){
   stage.removeAllEventListeners();
-  form.style.display = 'none';
-  console.log($('#p1name').val());
+  $('#myform').css('display', 'none');
   p1.playername = $('#p1name').val();
   p2.playername = $('#p2name').val();
+  $('#rules').css('display', 'none');
   init();
 }
 
@@ -173,7 +176,7 @@ function asset(assetType, assetHeight, assetWidth, assetX, assetY){
 
 function textField(datText, xCoord, yCoord, alignment){
   var messageField;
-  messageField = new createjs.Text(datText, "bold 24px Arial", "#14f509");
+  messageField = new createjs.Text(datText, "bold 24px Arial", "#000000");
   messageField.maxWidth = 1000;
   messageField.textAlign = alignment;
   messageField.textBaseline = "top";
@@ -215,6 +218,7 @@ function createLevel(lvlname){
   hero();
   var wc = 1;
   var hc = 1;
+  ladders = [];
   floorplan = [];
   enemies = [];
   holes = [];
@@ -233,6 +237,7 @@ function createLevel(lvlname){
         block = new asset('ladder', 128, 64, wc*32 - 16, (hc*128));
         stage.addChild(block);
         floorplan.push(block);
+        ladders.push(block);
         wc++;
       } else if (txtout[i] == '|') {
         block = new asset('blank', 16, 32, wc*32 - 16, (hc*128));
@@ -272,6 +277,19 @@ function createLevel(lvlname){
 			ninja.y += 2;
 		}
 	}
+
+  function ninjaClimb(){
+    var climbable = 0;
+    for (var i = 0; i < ladders.length; i++) {
+      if ((Math.abs(ninja.x - ladders[i].x) <= 10) && (Math.abs(ninja.y - ladders[i].y) <= 1)) {
+        climbable += 1;
+      }
+    }
+    if(climbable > 0){
+      ninja.y += 2;
+      ninja.climbing = true;
+    }
+  }
 
   function ninjaFall(){
     var grounded = 0;
@@ -371,9 +389,10 @@ function createLevel(lvlname){
   }
 
 	function keyInput(){
-		if(keys[39]){ninjaRight();}
-		if(keys[37]){ninjaLeft();}
-		if(keys[38]){if (ninja.jumpTime == 0 && ninja.falling == false) {ninjaJump();}}
+		if(keys[39] || keys[68]){ninjaRight();}
+		if(keys[37] || keys[65]){ninjaLeft();}
+		if(keys[16]){if (ninja.jumpTime == 0 && ninja.falling == false) {ninjaJump();}}
+    if(keys[40] || keys[83]){ninjaClimb();}
 	}
 
 /*

@@ -2,21 +2,21 @@ form{
     display: none;
     font-size: 0.8em;
     width: 300px;
-    background-color: rgb(26, 219, 26);
+    background-color: rgba(255, 255, 255, 0);
     margin: auto;
     padding: 10px;
-    border-style: solid;
-    border-width: 2px;
-    border-color: #0099FF;
     text-align: left;
-    color: #e61010;
     opacity:0;
 }
-canvas{
+
+label{
+  color: rgb(222, 29, 29);
+  text-shadow: 0px 0px 6px rgba(0,0,0,.7);
+  font-size: 2em;
 }
 
-button{
-  clear: both;
+#rules{
+  display: block;
 }
 #submit{
     text-align: right;
