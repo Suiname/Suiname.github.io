@@ -95,8 +95,7 @@ function init() {
     {src: "2.txt", id:"level2"},
     {src: "3.txt", id:"level3"},
     {src: "win.jpg", id:"win"},
-    {src: "results.png", id:"results"},
-    {src: "setup.jpg", id:"first"}
+    {src: "results.png", id:"results"}
 	];
 
   loader = new createjs.LoadQueue(false);

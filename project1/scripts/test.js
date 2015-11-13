@@ -50,7 +50,6 @@ function start() {
   createjs.Tween.get(formDOMElement).to({x:stage.canvas.width/2, y:150, rotation:720},2000, createjs.Ease.cubicOut);
 
   // stage.addChild(formDOMElement);
-  stage.addChild()
 }
 
 function subfunc(){
@@ -83,9 +82,9 @@ function init() {
 
   images = [
 		{src: "ninja.png", id: "ninja"},
-		{src: "MonsterARun.png", id: "enemy1"},
+		{src: "zombie.png", id: "enemy1"},
 		{src: "gameover.jpg", id: "gameover"},
-		{src: "player2.png", id:"player2"},
+		{src: "p2ready.jpg", id:"player2"},
 		{src: "chest.png", id:"chest"},
     {src: "ladder2.png", id:"ladder"},
     {src: "floor.png", id:"floor"},
@@ -95,8 +94,7 @@ function init() {
     {src: "2.txt", id:"level2"},
     {src: "3.txt", id:"level3"},
     {src: "win.jpg", id:"win"},
-    {src: "results.png", id:"results"},
-    {src: "setup.jpg", id:"first"}
+    {src: "results.png", id:"results"}
 	];
 
   loader = new createjs.LoadQueue(false);
@@ -337,7 +335,9 @@ function createLevel(lvlname){
 
 
 	function gravityCheck(){
-
+    if (ninja.y > 750){
+      gameOverMan();
+    }
 		if (ninja.jumpTime == 0) {
       ninjaFall();
 		}
@@ -462,7 +462,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
 			}
 		} else {
 			for (var i = 0; i < enemies.length; i++) {
-				if (Math.abs(ninja.x - enemies[i].x) <= 10){
+				if (Math.abs(ninja.x - enemies[i].x) <= 20){
 					if (Math.abs(ninja.y - enemies[i].y) <= 38){
 							createjs.Ticker.removeAllEventListeners(); //stop the ticker
 							gameOverMan();
@@ -527,7 +527,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
     if (activeplayer == 1) {
       window.setTimeout(nextPlayer, 4000);
     } else {
-      results();
+      window.setTimeout(results, 4000);
     }
   }
 
@@ -541,7 +541,7 @@ which stops the ticker (animation engine) then calls the gameOverMan method
   }
 
   function results(){
-    var resultsText, textBox, goText;
+    var resultsText, textBox, goText, paText;
     stage = new createjs.Stage("testCanvas");
     var resultsImage = new createjs.Bitmap(loader.getResult("results"));
     if (p1.score > p2.score) {
@@ -555,7 +555,10 @@ which stops the ticker (animation engine) then calls the gameOverMan method
     goText.color = '#bad94a';
     textBox = new textField(resultsText, 40, 220, 'left');
     textBox.color = '#bad94a';
-    stage.addChild(resultsImage, goText, textBox);
+    paText = new textField('Click Here to Play Again', 40, 320, 'left')
+    paText.color = '#bad94a';
+    paText.addEventListener("click", init);
+    stage.addChild(resultsImage, goText, textBox, paText);
     resetAll();
   }
 /*
